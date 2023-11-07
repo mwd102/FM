@@ -1,32 +1,112 @@
-from flask import Flask, request, render_template, redirect, make_response, url_for
+from flask import (
+    Flask, request, render_template,
+    redirect, make_response, url_for
+    )
 import os
 import pandas as pd
 
+from calculate_functions import *
+
+
 app = Flask(__name__)
+
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
+
+@app.route('/upload', methods=['POST'])
+def upload_file():
+    try:
+        if 'file' not in request.files:
+            return "No file part"
+
+        file = request.files['file']
+
+        if file.filename == '':
+            return "No selected file"
+
+        if file:
+            try:
+                # Read the uploaded HTML file using Pandas
+                # This assumes the HTML file contains tables
+                squad_rawdata_list = pd.read_html(
+                    file, header=0, encoding='utf-8')
+
+                squad_rawdata = squad_rawdata_list[0]
+
+                # List containing all functions to be ran
+                calculation_functions = [
+                    calculate_speed_workrate_score,
+                    calculate_gk_score,
+                    calculate_fb_score,
+                    calculate_cb_score,
+                    calculate_dm_score,
+                    calculate_segundo_volante_score,
+                    calculate_box2box_score,
+                    calculate_winger_score,
+                    calculate_inverted_winger_score,
+                    calculate_amc_score,
+                    calculate_striker_score
+                ]
+
+                # Each function is called as the list is looped over.
+                for calculation_function in calculation_functions:
+                    squad_rawdata = calculation_function(squad_rawdata)
+
+                # Builds Squad Dataframe using only columns
+                # that will be exported to HTML
+                squad = squad_rawdata[[
+                    'Inf', 'Name', 'Age', 'Club', 'Transfer Value', 'Wage',
+                    'Nat', 'Position', 'Personality', 'Media Handling',
+                    'Left Foot', 'Right Foot', 'Spd', 'Jum', 'Str', 'Work',
+                    'Height', 'gk', 'fb', 'cb', 'vol', 'str']]
+
+                html = generate_html(squad)
+
+                response = make_response(html)
+                response.headers['Content-Type'] = 'text/html'
+                return response
+            except ValueError as ve:
+                return render_template("error.html", error=ve)
+    except Exception as e:
+        return f"An error occurred: {str(e)}", 500
+
+
+@app.route('/<path:invalid_route>')
+def invalid_route(invalid_route):
+    # Route back to index page on invalid route
+    return redirect(url_for('index'))
+
+
 def generate_html(dataframe: pd.DataFrame):
-    
-    # get the table HTML from the dataframe
+
+    # Get the table HTML from the dataframe
     table_html = dataframe.to_html(table_id="table", index=False, na_rep='')
-    # construct the complete HTML with jQuery Data tables
-    # You can disable paging or enable y scrolling on lines 20 and 21 respectively
+    # Construct the HTML with jQuery Data tables
     html = f"""
     <html>
     <header>
         <meta charset="utf-8">
-        <link href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" rel="stylesheet">
+        <link
+         href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css"
+         rel="stylesheet">
+        <title>Processed FM Data</title>
     </header>
     <body>
-    <a onclick="this.href='data:text/html;charset=UTF-8,'+encodeURIComponent(document.documentElement.outerHTML)" href="#" download="processed_data.html"">
+    <a onclick="this.href='data:text/html;charset=UTF-8,
+    '+encodeURIComponent(document.documentElement.outerHTML)"
+     href="#" download="processed_data.html"">
         <button>Download HTML</button>
     </a>
     {table_html}
-    <script src="https://code.jquery.com/jquery-3.6.0.slim.min.js" integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI=" crossorigin="anonymous"></script>
-    <script type="text/javascript" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.slim.min.js"
+    integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI="
+    crossorigin="anonymous"></script>
+    <script type="text/javascript"
+    src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js">
+    </script>
     <script>
         $(document).ready( function () {{
             $('#table').DataTable({{
@@ -39,216 +119,9 @@ def generate_html(dataframe: pd.DataFrame):
     </body>
     </html>
     """
-    # return the html as bytes
+    # Return the HTML as bytes
     return html.encode('utf-8')
 
 
-@app.route('/upload', methods=['POST'])
-def upload_file():
-    if 'file' not in request.files:
-        return "No file part"
-    
-    file = request.files['file']
-
-    if file.filename == '':
-        return "No selected file"
-    
-    if file:
-        # filename = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
-        # file.save(filename)
-
-        # Read the uploaded HTML file using Pandas
-        squad_rawdata_list = pd.read_html(file, header=0, encoding='utf-8')  # This assumes the HTML file contains tables
-        
-        squad_rawdata = squad_rawdata_list[0]
-
-        # Calculate simple speed and workrate scores
-        squad_rawdata['Spd'] = ( squad_rawdata['Pac'] + squad_rawdata['Acc'] ) / 2
-        squad_rawdata['Work'] = ( squad_rawdata['Wor'] + squad_rawdata['Sta'] ) / 2
-        squad_rawdata['SetP'] = ( squad_rawdata['Jum'] + squad_rawdata['Bra'] ) / 2
-
-        # calculates gk score
-        squad_rawdata['gk_essential'] = (
-            ( squad_rawdata['Agi'] + 
-            squad_rawdata['Ref']) * 5)
-        squad_rawdata['gk_core'] = (
-            ( squad_rawdata['1v1'] + 
-            squad_rawdata['Ant'] + 
-            squad_rawdata['Cmd'] + 
-            squad_rawdata['Cnt'] + 
-            squad_rawdata['Kic'] + 
-            squad_rawdata['Pos']) * 3)
-        squad_rawdata['gk_secondary'] = (
-            ( squad_rawdata['Acc'] +
-            squad_rawdata['Aer'] +
-            squad_rawdata['Cmp'] + 
-            squad_rawdata['Dec'] + 
-            squad_rawdata['Fir'] + 
-            squad_rawdata['Han'] + 
-            squad_rawdata['Pas'] + 
-            squad_rawdata['Thr'] + 
-            squad_rawdata['Vis']) * 1)
-        squad_rawdata['gk'] = ( ((squad_rawdata['gk_essential']) + (squad_rawdata['gk_core']) + (squad_rawdata['gk_secondary'])) / 37 )
-        squad_rawdata.gk= squad_rawdata.gk.round(1)
-        # for others: squad_rawdata['gk_core'] = ( squad_rawdata[''] + squad_rawdata[''] + squad_rawdata['']+ squad_rawdata['']+ squad_rawdata['']+ squad_rawdata['']+ squad_rawdata['']) / 2
-
-        # calculates fb score
-        squad_rawdata['fb_essential'] = ( 
-            squad_rawdata['Wor'] +
-            squad_rawdata['Acc'] + 
-            squad_rawdata['Pac'] + 
-            squad_rawdata['Sta'])
-        squad_rawdata['fb_core'] = ( 
-            squad_rawdata['Cro'] + 
-            squad_rawdata['Dri'] + 
-            squad_rawdata['Mar'] + 
-            squad_rawdata['OtB'] + 
-            squad_rawdata['Tck'] + 
-            squad_rawdata['Tea'])
-        squad_rawdata['fb_secondary'] = ( 
-            squad_rawdata['Agi'] + 
-            squad_rawdata['Ant'] + 
-            squad_rawdata['Cnt'] + 
-            squad_rawdata['Dec'] + 
-            squad_rawdata['Fir'] + 
-            squad_rawdata['Pas'] + 
-            squad_rawdata['Pos'] + 
-            squad_rawdata['Tec'])
-        squad_rawdata['fb'] =( ( ( squad_rawdata['fb_essential'] * 5) + ( squad_rawdata['fb_core'] * 3) + (squad_rawdata['fb_secondary'] * 1)) / 46 )
-        squad_rawdata.fb= squad_rawdata.fb.round(1)
-
-        # calculates cb score
-        squad_rawdata['cb_core'] = ( squad_rawdata['Cmp'] + squad_rawdata['Hea'] + squad_rawdata['Jum']+ squad_rawdata['Mar']+ squad_rawdata['Pas']+ squad_rawdata['Pos']+ squad_rawdata['Str'] + squad_rawdata['Tck'] + squad_rawdata['Pac']) / 9
-        squad_rawdata['cb_secondary'] = ( squad_rawdata['Agg'] + squad_rawdata['Ant'] + squad_rawdata['Bra']+ squad_rawdata['Cnt']+ squad_rawdata['Dec']+ squad_rawdata['Fir']+ squad_rawdata['Tec']+ squad_rawdata['Vis']) / 8
-        squad_rawdata['cb'] =( ( squad_rawdata['cb_core'] * 0.75) + (squad_rawdata['cb_secondary'] * 0.25))
-        squad_rawdata.cb= squad_rawdata.cb.round(1)
-
-        # calculates dm score
-        squad_rawdata['dm'] = ((
-            ( squad_rawdata['Wor'] * 5) + 
-            ( squad_rawdata['Pac'] * 5) + 
-            ( squad_rawdata['Sta'] * 3) + 
-            ( squad_rawdata['Pas'] * 3) + 
-            ( squad_rawdata['Tck'] * 2) + 
-            ( squad_rawdata['Ant'] * 2) + 
-            ( squad_rawdata['Cnt'] * 2) + 
-            ( squad_rawdata['Pos'] * 2) + 
-            ( squad_rawdata['Bal'] * 2) + 
-            ( squad_rawdata['Agi'] * 2) + 
-            ( squad_rawdata['Tea'] * 1) + 
-            ( squad_rawdata['Fir'] * 1) +
-            ( squad_rawdata['Mar'] * 1) +
-            ( squad_rawdata['Agg'] * 1) +
-            ( squad_rawdata['Cmp'] * 1) +
-            ( squad_rawdata['Dec'] * 1) +
-            ( squad_rawdata['Str'] * 1) ) / 35)
-        squad_rawdata.dm= squad_rawdata.dm.round(1)
-
-        # calculates segundo volante on attack score
-        squad_rawdata['vol'] = ((
-            ( squad_rawdata['Wor'] * 5) + 
-            ( squad_rawdata['Pac'] * 5) + 
-            ( squad_rawdata['Sta'] * 3) + 
-            ( squad_rawdata['Pas'] * 3) + 
-            ( squad_rawdata['Tck'] * 2) + 
-            ( squad_rawdata['Ant'] * 2) + 
-            ( squad_rawdata['Cnt'] * 2) + 
-            ( squad_rawdata['Pos'] * 2) + 
-            ( squad_rawdata['Tea'] * 2) + 
-            ( squad_rawdata['Fir'] * 1) +
-            ( squad_rawdata['Mar'] * 1) +
-            ( squad_rawdata['Agg'] * 1) +
-            ( squad_rawdata['Cmp'] * 1) +
-            ( squad_rawdata['Dec'] * 1) +
-            ( squad_rawdata['Str'] * 1) ) / 32)
-        squad_rawdata.vol= squad_rawdata.vol.round(1)
-
-        # calculates box2box score
-        squad_rawdata['box2'] = (
-            ( squad_rawdata['Pas'] * 5) + 
-            ( squad_rawdata['Wor'] * 5) + 
-            ( squad_rawdata['Sta'] * 4) + 
-            ( squad_rawdata['Tck'] * 3) + 
-            ( squad_rawdata['OtB'] * 3) + 
-            ( squad_rawdata['Tea'] * 3) + 
-            ( squad_rawdata['Vis'] * 2) + 
-            ( squad_rawdata['Str'] * 2) + 
-            ( squad_rawdata['Dec'] * 2) + 
-            ( squad_rawdata['Pos'] * 2) + 
-            ( squad_rawdata['Pac'] * 2) +
-            ( squad_rawdata['Agg'] * 1) +
-            ( squad_rawdata['Ant'] * 1) +
-            ( squad_rawdata['Fin'] * 1) +
-            ( squad_rawdata['Lon'] * 1) +
-            ( squad_rawdata['Cmp'] * 1) +
-            ( squad_rawdata['Acc'] * 1) +
-            ( squad_rawdata['Bal'] * 1) +
-            ( squad_rawdata['Fir'] * 1) +
-            ( squad_rawdata['Dri'] * 1) +
-            ( squad_rawdata['Tec'] * 1))
-        squad_rawdata.box2= squad_rawdata.box2.round(0)
-
-        # calculates winger score
-        squad_rawdata['w_core'] = ( squad_rawdata['Acc'] + squad_rawdata['Cro'] + squad_rawdata['Dri']+ squad_rawdata['OtB']+ squad_rawdata['Pac']+ squad_rawdata['Tec']) / 6
-        squad_rawdata['w_secondary'] = ( squad_rawdata['Agi'] + squad_rawdata['Fir'] + squad_rawdata['Pas']+ squad_rawdata['Sta']+ squad_rawdata['Wor']) / 5
-        squad_rawdata['w'] =( ( squad_rawdata['w_core'] * 0.75) + (squad_rawdata['w_secondary'] * 0.25))
-        squad_rawdata.w= squad_rawdata.w.round(1)
-
-        # calculates inverted winger score 
-        squad_rawdata['amrl'] = ((
-            ( squad_rawdata['Acc'] * 5) + 
-            ( squad_rawdata['Pac'] * 5) + 
-            ( squad_rawdata['Wor'] * 5) + 
-            ( squad_rawdata['Dri'] * 3) + 
-            ( squad_rawdata['Pas'] * 3) + 
-            ( squad_rawdata['Tec'] * 3) + 
-            ( squad_rawdata['OtB'] * 3) +
-            ( squad_rawdata['Cro'] * 1) + 
-            ( squad_rawdata['Fir'] * 1) +
-            ( squad_rawdata['Cmp'] * 1) +
-            ( squad_rawdata['Dec'] * 1) +
-            ( squad_rawdata['Vis'] * 1) +
-            ( squad_rawdata['Agi'] * 1) + 
-            ( squad_rawdata['Sta'] * 1))/ 34)
-        squad_rawdata.amrl= squad_rawdata.amrl.round(1)
-
-        # calculates amc score
-        squad_rawdata['amc'] = (
-            ( squad_rawdata['Vis'] * 4) + 
-            ( squad_rawdata['OtB'] * 4) + 
-            ( squad_rawdata['Pas'] * 4) + 
-            ( squad_rawdata['Dec'] * 3) + 
-            ( squad_rawdata['Ant'] * 3) + 
-            ( squad_rawdata['Cmp'] * 3) + 
-            ( squad_rawdata['Tec'] * 3) + 
-            ( squad_rawdata['Dri'] * 1) + 
-            ( squad_rawdata['Fir'] * 1) + 
-            ( squad_rawdata['Fla'] * 1) + 
-            ( squad_rawdata['Lon'] * 1) + 
-            ( squad_rawdata['Agi'] * 1) + 
-            ( squad_rawdata['Fin'] * 1))
-        squad_rawdata.amc= squad_rawdata.amc.round(0)
-
-        # calculates striker score
-        squad_rawdata['str_core'] = ( squad_rawdata['Cmp'] + squad_rawdata['Fin'] + squad_rawdata['OtB'] + squad_rawdata['Pac']) / 4
-        squad_rawdata['str_secondary'] = ( squad_rawdata['Acc'] + squad_rawdata['Agi'] + squad_rawdata['Ant']+ squad_rawdata['Bal']+ squad_rawdata['Dec']+ squad_rawdata['Dri']+ squad_rawdata['Fir']+ squad_rawdata['Pas']+ squad_rawdata['Sta']+ squad_rawdata['Tec']+ squad_rawdata['Wor']) / 11
-        squad_rawdata['str'] =( ( squad_rawdata['str_core'] * 0.5) + (squad_rawdata['str_secondary'] * 0.5))
-        squad_rawdata.str= squad_rawdata.str.round(1)
-
-        # builds squad dataframe using only columns that will be exported to HTML
-        squad = squad_rawdata[['Inf','Name','Age','Club','Transfer Value','Wage','Nat','Position','Personality','Media Handling','Left Foot', 'Right Foot','Spd','Jum','Str','Work','Height','gk','fb','cb','vol','str']]
-
-        html = generate_html(squad)
-
-        response = make_response(html)
-        response.headers['Content-Type'] = 'text/html'
-        return response
-
-@app.route('/<path:invalid_route>')
-def invalid_route(invalid_route):
-    #Return 404.html if this route is called
-    return redirect(url_for('index'))
-
 if __name__ == '__main__':
     app.run(debug=True)
-
