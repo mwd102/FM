@@ -1,5 +1,6 @@
-def calculate_segundo_volante_score(squad_rawdata):
+def calculate_segundo_volante_score(squad_rawdata, sv_core):
     squad_rawdata['vol'] = ((
+        #Default: 32
         (squad_rawdata['Wor'] * 5) +
         (squad_rawdata['Pac'] * 5) +
         (squad_rawdata['Sta'] * 3) +
@@ -15,6 +16,6 @@ def calculate_segundo_volante_score(squad_rawdata):
         (squad_rawdata['Cmp'] * 1) +
         (squad_rawdata['Dec'] * 1) +
         (squad_rawdata['Str'] * 1))
-        / 32)
+        / sv_core)
     squad_rawdata.vol = squad_rawdata.vol.round(1)
     return squad_rawdata

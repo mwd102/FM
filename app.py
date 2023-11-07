@@ -47,34 +47,66 @@ def upload_file():
 
                 squad_rawdata = squad_rawdata_list[0]
 
-                # List containing all functions to be ran
-                calculation_functions = [
-                    calculate_speed_workrate_score,
-                    calculate_gk_score,#
-                    calculate_fb_score,#
-                    calculate_cb_score,#
-                    calculate_dm_score,
-                    calculate_segundo_volante_score,#
-                    calculate_box2box_score,#
-                    calculate_winger_score,#
-                    calculate_inverted_winger_score,
-                    calculate_amc_score,#
-                    calculate_striker_score#
-                ]
+                #Calculate Speed & Workrate Score
+                speed = int(request.form['speed'])
+                workrate = int(request.form['workrate'])
+                setp = int(request.form['setp'])
+                squad_rawdata = calculate_speed_workrate_score(squad_rawdata, speed, workrate, setp)
 
-                # Each function is called as the list is looped over.
-                for calculation_function in calculation_functions:
-                    squad_rawdata = calculation_function(squad_rawdata)
+                #Calculate GK Score
+                gk_essential = int(request.form['gk_essential'])
+                gk_core = int(request.form['gk_core'])
+                gk_secondary = int(request.form['gk_secondary'])
+                squad_rawdata = calculate_gk_score(squad_rawdata, gk_essential, gk_core, gk_secondary)
+
+                #Calculate FB Score
+                fb_essential = int(request.form['fb_essential'])
+                fb_core = int(request.form['fb_core'])
+                fb_secondary = int(request.form['fb_secondary'])
+                squad_rawdata = calculate_fb_score(squad_rawdata, fb_essential, fb_core, fb_secondary)
+
+                #Calculate CB Score
+                cb_core = int(request.form['cb_core'])
+                cb_secondary = int(request.form['cb_secondary'])
+                squad_rawdata = calculate_cb_score(squad_rawdata, cb_core, cb_secondary)
+
+                #Calculate DM Score
+                dm_core = int(request.form['dm_core'])
+                squad_rawdata = calculate_dm_score(squad_rawdata, dm_core)
+
+                #Calculate SV Score
+                sv_core = int(request.form['sv_core'])
+                squad_rawdata = calculate_segundo_volante_score(squad_rawdata, sv_core)
+
+                #Calculate B2B Score
+                b2b_core = int(request.form['b2b_core'])
+                squad_rawdata = calculate_box2box_score(squad_rawdata, b2b_core)
+                
+                #Calculate W Score
+                wing_core = int(request.form['wing_core'])
+                wing_secondary = int(request.form['wing_secondary'])
+                squad_rawdata = calculate_winger_score(squad_rawdata, wing_core, wing_secondary)
+
+                #Calculate IW Score
+                iw_core = int(request.form['iw_core'])
+                squad_rawdata = calculate_inverted_winger_score(squad_rawdata, iw_core)
+
+                #Calculate AMC Score
+                amc_core = int(request.form['amc_core'])
+                squad_rawdata = calculate_amc_score(squad_rawdata, amc_core)
+
+                #Calculate STR Score
+                str_core = int(request.form['str_core'])
+                str_secondary = int(request.form['str_secondary'])
+                squad_rawdata = calculate_striker_score(squad_rawdata, str_core, str_secondary)
 
                 # Builds Squad Dataframe using only columns
                 # that will be exported to HTML
-                print(selected_options)
                 squad = squad_rawdata[[
                     'Inf', 'Name', 'Age', 'Club', 'Transfer Value', 'Wage',
                     'Nat', 'Position', 'Personality', 'Media Handling',
                     'Left Foot', 'Right Foot', 'Spd', 'Jum', 'Str', 'Work',
                     'Height'] + selected_options]
-                print(squad)
 
                 html = generate_html(squad)
 

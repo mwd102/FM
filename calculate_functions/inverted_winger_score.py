@@ -1,4 +1,5 @@
-def calculate_inverted_winger_score(squad_rawdata):
+def calculate_inverted_winger_score(squad_rawdata, iw_core):
+    #Default: 34
     squad_rawdata['amrl'] = ((
         (squad_rawdata['Acc'] * 5) +
         (squad_rawdata['Pac'] * 5) +
@@ -14,6 +15,6 @@ def calculate_inverted_winger_score(squad_rawdata):
         (squad_rawdata['Vis'] * 1) +
         (squad_rawdata['Agi'] * 1) +
         (squad_rawdata['Sta'] * 1))
-        / 34)
+        / iw_core)
     squad_rawdata.amrl = squad_rawdata.amrl.round(1)
     return squad_rawdata

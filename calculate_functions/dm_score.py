@@ -1,5 +1,6 @@
-def calculate_dm_score(squad_rawdata):
+def calculate_dm_score(squad_rawdata, dm_core):
     squad_rawdata['dm'] = ((
+        #Default: 35
         (squad_rawdata['Wor'] * 5) +
         (squad_rawdata['Pac'] * 5) +
         (squad_rawdata['Sta'] * 3) +
@@ -16,6 +17,6 @@ def calculate_dm_score(squad_rawdata):
         (squad_rawdata['Agg'] * 1) +
         (squad_rawdata['Cmp'] * 1) +
         (squad_rawdata['Dec'] * 1) +
-        (squad_rawdata['Str'] * 1)) / 35)
+        (squad_rawdata['Str'] * 1)) / dm_core)
     squad_rawdata.dm = squad_rawdata.dm.round(1)
     return squad_rawdata

@@ -1,4 +1,4 @@
-def calculate_fb_score(squad_rawdata):
+def calculate_fb_score(squad_rawdata,fb_essential, fb_core, fb_secondary):
     squad_rawdata['fb_essential'] = (
         squad_rawdata['Wor'] +
         squad_rawdata['Acc'] +
@@ -22,9 +22,12 @@ def calculate_fb_score(squad_rawdata):
         squad_rawdata['Tec'])
     squad_rawdata['fb'] =(
         (
-            (squad_rawdata['fb_essential'] * 5) + 
-            ( squad_rawdata['fb_core'] * 3) + 
-            (squad_rawdata['fb_secondary'] * 1)
+            #Default: 5
+            (squad_rawdata['fb_essential'] * fb_essential) + 
+            #Default: 3
+            ( squad_rawdata['fb_core'] * fb_core) + 
+            #Default: 1
+            (squad_rawdata['fb_secondary'] * fb_secondary)
         ) / 46 )
     squad_rawdata.fb = squad_rawdata.fb.round(1)
     return squad_rawdata

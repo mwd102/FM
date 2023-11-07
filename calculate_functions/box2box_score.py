@@ -1,5 +1,6 @@
-def calculate_box2box_score(squad_rawdata):
+def calculate_box2box_score(squad_rawdata, b2b_core):
     squad_rawdata['box2'] = (
+        #Default: 1
         (squad_rawdata['Pas'] * 5) +
         (squad_rawdata['Wor'] * 5) +
         (squad_rawdata['Sta'] * 4) +
@@ -20,6 +21,7 @@ def calculate_box2box_score(squad_rawdata):
         (squad_rawdata['Bal'] * 1) +
         (squad_rawdata['Fir'] * 1) +
         (squad_rawdata['Dri'] * 1) +
-        (squad_rawdata['Tec'] * 1))
+        (squad_rawdata['Tec'] * 1)
+        ) * b2b_core
     squad_rawdata.box2 = squad_rawdata.box2.round(0)
     return squad_rawdata
