@@ -1,0 +1,23 @@
+#weight-button input {
+    width: 50%;
+}
+
+#weight-button {
+    display: flex;
+    justify-content: center;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.roles {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+.roles label {
+    margin-right: 20px;
+}
+  

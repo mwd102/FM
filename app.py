@@ -1,6 +1,7 @@
 from flask import (
     Flask, request, render_template,
-    redirect, make_response, url_for
+    redirect, make_response, url_for,
+    flash
     )
 import os
 import pandas as pd
@@ -10,9 +11,8 @@ if os.path.exists("env.py"):
 
 from calculate_functions import *
 
-
 app = Flask(__name__)
-
+app.secret_key = os.environ.get("SECRET_KEY")
 
 @app.route('/')
 def index():
@@ -23,15 +23,23 @@ def index():
 def upload_file():
     try:
         if 'file' not in request.files:
-            return "No file part"
+                flash('No file part.', 'error')
+                return redirect(url_for('index'))
 
         file = request.files['file']
 
         if file.filename == '':
-            return "No selected file"
+            flash('No file selected', 'error')
+            return redirect(url_for('index'))
 
         if file:
             try:
+                form_data = request.form.to_dict()
+
+                selected_options = [form_data[key] for key in form_data.keys() if key.startswith('option')]
+                if not selected_options:
+                    flash('At least one checkbox must be selected.', 'error')
+                    return redirect(url_for('index'))
                 # Read the uploaded HTML file using Pandas
                 # This assumes the HTML file contains tables
                 squad_rawdata_list = pd.read_html(
@@ -42,16 +50,16 @@ def upload_file():
                 # List containing all functions to be ran
                 calculation_functions = [
                     calculate_speed_workrate_score,
-                    calculate_gk_score,
-                    calculate_fb_score,
-                    calculate_cb_score,
+                    calculate_gk_score,#
+                    calculate_fb_score,#
+                    calculate_cb_score,#
                     calculate_dm_score,
-                    calculate_segundo_volante_score,
-                    calculate_box2box_score,
-                    calculate_winger_score,
+                    calculate_segundo_volante_score,#
+                    calculate_box2box_score,#
+                    calculate_winger_score,#
                     calculate_inverted_winger_score,
-                    calculate_amc_score,
-                    calculate_striker_score
+                    calculate_amc_score,#
+                    calculate_striker_score#
                 ]
 
                 # Each function is called as the list is looped over.
@@ -60,11 +68,13 @@ def upload_file():
 
                 # Builds Squad Dataframe using only columns
                 # that will be exported to HTML
+                print(selected_options)
                 squad = squad_rawdata[[
                     'Inf', 'Name', 'Age', 'Club', 'Transfer Value', 'Wage',
                     'Nat', 'Position', 'Personality', 'Media Handling',
                     'Left Foot', 'Right Foot', 'Spd', 'Jum', 'Str', 'Work',
-                    'Height', 'gk', 'fb', 'cb', 'vol', 'str']]
+                    'Height'] + selected_options]
+                print(squad)
 
                 html = generate_html(squad)
 
@@ -113,7 +123,8 @@ def generate_html(dataframe: pd.DataFrame):
                 // Add click event listener to the download button
                 document.getElementById('downloadButton').addEventListener('click', function () {{
                     // Create a Blob containing the HTML content
-                    var blob = new Blob(['<!DOCTYPE html><html>' + document.documentElement.outerHTML + '</html>'], {{ type: 'text/html' }});
+                    var blob = new Blob(['<!DOCTYPE html><html>' +
+                    document.documentElement.outerHTML + '</html>'], {{ type: 'text/html' }});
                     // Create a temporary URL for the Blob
                     var url = URL.createObjectURL(blob);
                     // Create a download link and trigger a click event to download the file

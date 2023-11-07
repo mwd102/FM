@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FM24 Player Recruitment</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css')}}" />
 </head>
 <body>
   <main>
@@ -13,9 +14,106 @@
       <p>Based on <a href="https://www.youtube.com/watch?v=hnAuOakqR90" target="_blank">this video</a> by <a href="https://twitter.com/playingsquirrel" target="_blank">squirrel_plays</a></p>
       <form method="POST" enctype="multipart/form-data" action="/upload">
         <input type="file" name="file">
+        <hr>
+        <p>Select Roles to Display:</p>
+        <div class="roles">
+          <label><input type="checkbox" name="option1" value="gk"> Goalkeeping</label><br>
+          <label><input type="checkbox" name="option2" value="fb"> Fullback</label><br>
+          <label><input type="checkbox" name="option3" value="cb"> Centreback</label><br>
+          <label><input type="checkbox" name="option4" value="vol"> Segundo Volante</label><br>
+          <label><input type="checkbox" name="option5" value="str"> Strike</label><br>
+        </div>
+        <div class="roles">
+          <label><input type="checkbox" name="option6" value="box2"> Box2Box</label><br>
+          <label><input type="checkbox" name="option7" value="amc"> AMC</label><br>
+          <label><input type="checkbox" name="option8" value="w"> Winger</label><br>
+          <label><input type="checkbox" name="option9" value="amrl"> ARML</label><br>
+          <label><input type="checkbox" name="option10" value="dm"> DM</label><br>
+        </div>
+        <hr>
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <ul class="flashes">
+              {% for message in messages %}
+                <li>{{ message }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
         <input type="submit" value="Upload">
+        <div id="weight-button">
+          <input type="button" value="Amend Score Weights" onclick="showWeights()">
+        </div>
+        <div id="weight-container" class="hidden">
+          <hr>
+          <details>
+            <summary>Speed & Workrate Weight</summary>
+            <label for="range">Speed (Pace + Acceleration / Value)
+              <input type="range" min="1" max="10" value="2" id="range" name="range">
+            </label>
+          </details>
+          <details>
+            <summary>Goalkeeping Weight</summary>
+            <p>…</p>
+          </details>
+          <details>
+            <summary>Fullback Weight</summary>
+            <p>…</p>
+          </details>
+          <details>
+            <summary>Centreback Weight</summary>
+            <p>…</p>
+          </details>
+          <details>
+            <summary>Defensive Midfielder Weight</summary>
+            <p>…</p>
+          </details>
+          <details>
+            <summary>Segundo Volante Weight</summary>
+            <p>…</p>
+          </details>
+          <details>
+            <summary>Box to Box Weight</summary>
+            <p>…</p>
+          </details>
+          <details>
+            <summary>Winger Weight</summary>
+            <p>…</p>
+          </details>
+          <details>
+            <summary>Inverted Winger Weight</summary>
+            <p>…</p>
+          </details>
+          <details>
+            <summary>Attacking Midfielder Weight</summary>
+            <p>…</p>
+          </details>
+          <details>
+            <summary>Striker Weight</summary>
+            <p>…</p>
+          </details>
+        </div>
       </form>
     </div>
   </main>
+  <script>
+    function showWeights() {
+      document.getElementById("weight-button").classList.add("hidden")
+      document.getElementById("weight-container").classList.remove("hidden")
+    }
+  </script>
+  <script>
+    const maxAllowed = 5;
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+  
+    checkboxes.forEach(checkbox => {
+      checkbox.addEventListener('change', function() {
+        let checkedCount = document.querySelectorAll('input[type="checkbox"]:checked').length;
+        if (checkedCount > maxAllowed) {
+          this.checked = false;
+        }
+      });
+    });
+  </script>
 </body>
 </html>
