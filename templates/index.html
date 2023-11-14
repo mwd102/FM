@@ -15,21 +15,19 @@
       <form method="POST" enctype="multipart/form-data" action="/upload">
         <input type="file" name="file">
         <hr>
-        <p>Select Roles to Display:</p>
-        <div class="roles">
-          <label><input type="checkbox" name="option1" value="gk"> Goalkeeping</label><br>
-          <label><input type="checkbox" name="option2" value="fb"> Fullback</label><br>
-          <label><input type="checkbox" name="option3" value="cb"> Centreback</label><br>
-          <label><input type="checkbox" name="option4" value="vol"> Segundo Volante</label><br>
-          <label><input type="checkbox" name="option5" value="str"> Strike</label><br>
-        </div>
-        <div class="roles">
-          <label><input type="checkbox" name="option6" value="box2"> Box2Box</label><br>
-          <label><input type="checkbox" name="option7" value="amc"> AMC</label><br>
-          <label><input type="checkbox" name="option8" value="w"> Winger</label><br>
-          <label><input type="checkbox" name="option9" value="amrl"> ARML</label><br>
-          <label><input type="checkbox" name="option10" value="dm"> DM</label><br>
-        </div>
+        <p>Select Roles to Display: (8 Max)</p>
+        <details role="list">
+          <summary aria-haspopup="listbox">Select up to 8 roles</summary>
+          <ul role="listbox" id="roleField">
+            {% for function_name, values in function_names.items() %}
+            <li>
+              <label>
+                <input type="checkbox" name="{{values.1}}" value="{{ function_name }}">{{values.0}}<br>
+              </label>
+            </li>
+            {% endfor %}
+          </ul>
+        </details>
         <hr>
         {% with messages = get_flashed_messages() %}
           {% if messages %}
@@ -41,189 +39,11 @@
           {% endif %}
         {% endwith %}
         <input type="submit" value="Upload">
-        <div id="weight-button">
-          <input type="button" value="Amend Score Weights" onclick="showWeights()">
-        </div>
-        <div id="weight-container" class="hidden">
-          <hr>
-          <!--                         -->
-          <!-- Speed & Workrate Weights-->
-          <!--                         -->
-          <details>
-            <summary>Speed & Workrate Weight</summary>
-            <label for="speed">
-              Speed (Pac + Acc / Value)
-              <p>Current Value: <span>2</span></p>
-              <input type="range" min="1" max="10" value="2" id="speed" name="speed" oninput="updateSpanValue(this)">
-            </label>
-            <label for="workrate">
-              Workrate (Wor + Sta / Value)
-              <p>Current Value: <span>2</span></p>
-              <input type="range" min="1" max="10" value="2" id="workrate" name="workrate" oninput="updateSpanValue(this)">
-            </label>
-            <label for="setp">
-              Set Pieces (Jum + Bra / Value)
-              <p>Current Value: <span>2</span></p>
-              <input type="range" min="1" max="10" value="2" id="setp" name="setp" oninput="updateSpanValue(this)">
-            </label>
-          </details>
-          <!--                    -->
-          <!-- Goalkeeping Weights-->
-          <!--                    -->
-          <details>
-            <summary>Goalkeeping Weight</summary>
-            <label for="gk_essential">
-              GK Essential (Agi + Ref * Value)
-              <p>Current Value: <span>5</span></p>
-              <input type="range" min="1" max="10" value="5" id="gk_essential" name="gk_essential" oninput="updateSpanValue(this)">
-            </label>
-            <label for="gk_core">
-              GK Core (1v1 + Ant + Cmd + Cnt + Kic + Pos * Value)
-              <p>Current Value: <span>3</span></p>
-              <input type="range" min="1" max="10" value="3" id="gk_core" name="gk_core" oninput="updateSpanValue(this)">
-            </label>
-            <label for="gk_secondary">
-              GK Secondary (Acc + Aer + Cmp + Dec + Fir + Han + Pas + Thr + Vis * Value)
-              <p>Current Value: <span>1</span></p>
-              <input type="range" min="1" max="10" value="1" id="gk_secondary" name="gk_secondary" oninput="updateSpanValue(this)">
-            </label>
-          </details>
-          <!--                  -->
-          <!-- Fullback Weights -->
-          <!--                  -->
-          <details> 
-            <summary>Fullback Weight</summary>
-            <label for="fb_essential">
-              FB Essential (Wor + Acc + Pac + Sta * Value)
-              <p>Current Value: <span>5</span></p>
-              <input type="range" min="1" max="10" value="5" id="fb_essential" name="fb_essential" oninput="updateSpanValue(this)">
-            </label>
-            <label for="fb_core">
-              FB Core (Cro + Dri + Mar + OtB + Tck + Tea * Value)
-              <p>Current Value: <span>3</span></p>
-              <input type="range" min="1" max="10" value="3" id="fb_core" name="fb_core" oninput="updateSpanValue(this)">
-            </label>
-            <label for="fb_secondary">
-              GK Secondary (Agi + Ant + Cnt + Dec + Fir + Pas + Pos + Tec * Value)
-              <p>Current Value: <span>1</span></p>
-              <input type="range" min="1" max="10" value="1" id="fb_secondary" name="fb_secondary" oninput="updateSpanValue(this)">
-            </label>
-          </details>
-          <!--                    -->
-          <!-- Centreback Weights -->
-          <!--                    -->
-          <details>
-            <summary>Centreback Weight</summary>
-            <label for="cb_core">
-              CB Core (Cmp + Hea + Jum + Mar + Pas + Pos + Str + Tck + Pac / Value)
-              <p>Current Value: <span>9</span></p>
-              <input type="range" min="1" max="10" value="9" id="cb_core" name="cb_core" oninput="updateSpanValue(this)">
-            </label>
-            <label for="cb_secondary">
-              CB Secondary (Agg + Ant + Bra + Cnt + Dec + Fir + Tec + Vis / Value)
-              <p>Current Value: <span>8</span></p>
-              <input type="range" min="1" max="10" value="8" id="cb_secondary" name="cb_secondary" oninput="updateSpanValue(this)">
-            </label>
-          </details>
-          <!--                              -->
-          <!-- Defensive Midfielder Weights -->
-          <!--                              -->
-          <details>
-            <summary>Defensive Midfielder Weight</summary>
-            <label for="dm_core">
-              DM Core (Wor + Pac + Sta + Pas + Tck + Ant + Cnt + Pos + Bal + Agi + Tea + Fir + Mar + Agg + Cmp + Dec + Str / Value)
-              <p>Current Value: <span>35</span></p>
-              <input type="range" min="1" max="50" value="35" id="dm_core" name="dm_core" oninput="updateSpanValue(this)">
-            </label>
-          </details>
-          <!--                              -->
-          <!--    Segundo Volante Weights   -->
-          <!--                              -->
-          <details>
-            <summary>Segundo Volante Weight</summary>
-            <label for="sv_core">
-              Segundo Volante (Wor + Pac + Sta + Pas + Tck + Ant + Cnt + Pos + Tea + Fir + Mar + Agg + Cmp + Dec + Str / Value)
-              <p>Current Value: <span>32</span></p>
-              <input type="range" min="1" max="50" value="32" id="sv_core" name="sv_core" oninput="updateSpanValue(this)">
-            </label>
-          </details>
-          <!--                         -->
-          <!--    Box 2 Box  Weights   -->
-          <!--                         -->
-          <details>
-            <summary>Box to Box Weight</summary>
-            <label for="b2b_core">
-              Box to Box (Pas + Wor + Sta + Tck + OtB + Tea + Vis + Str + Dec + Pos + Pac + Agg + Ant + Fin + Lon + Cmp + Acc + Bal + Fir + Dri + Tec * Value)
-              <p>Current Value: <span>1</span></p>
-              <input type="range" min="1" max="10" value="1" id="b2b_core" name="b2b_core" oninput="updateSpanValue(this)">
-            </label>
-          </details>
-          <!--                     -->
-          <!--   Winger  Weights   -->
-          <!--                     -->
-          <details>
-            <summary>Winger Weight</summary>
-            <label for="wing_core">
-              Winger Core (Acc + Cro + Dri + OtB + Pac + Tec * Value)
-              <p>Current Value: <span>6</span></p>
-              <input type="range" min="1" max="10" value="6" id="wing_core" name="wing_core" oninput="updateSpanValue(this)">
-            </label>
-            <label for="wing_secondary">
-              Winger Secondary (Agi + Fir + Pas + Sta + Wor * Value)
-              <p>Current Value: <span>5</span></p>
-              <input type="range" min="1" max="10" value="5" id="wing_secondary" name="wing_secondary" oninput="updateSpanValue(this)">
-            </label>
-          </details>
-          <details>
-            <!--                              -->
-            <!--   Inverted Winger  Weights   -->
-            <!--                              -->
-            <summary>Inverted Winger Weight</summary>
-            <label for="iw_core">
-              Inverted Winger (Acc + Pac + Wor + Dri + Pas + Tec + OtB + Cro + Fir + Cmp + Dec + Vis + Agi + Sta / Value)
-              <p>Current Value: <span>34</span></p>
-              <input type="range" min="1" max="50" value="34" id="iw_core" name="iw_core" oninput="updateSpanValue(this)">
-            </label>
-          </details>
-            <!--                              -->
-            <!-- Attacking Midfielder Weights -->
-            <!--                              -->
-          <details>
-            <summary>Attacking Midfielder Weight</summary>
-            <label for="amc_core">
-              Inverted Winger (Vis + OtB + Pas + Dec + Ant + Cmp + Tec + Dri + Fir + Fla + Lon + Agi + Fin * Value)
-              <p>Current Value: <span>1</span></p>
-              <input type="range" min="1" max="10" value="1" id="amc_core" name="amc_core" oninput="updateSpanValue(this)">
-            </label>
-          </details>
-            <!--                 -->
-            <!-- Striker Weights -->
-            <!--                 -->
-          <details>
-            <summary>Striker Weight</summary>
-            <label for="str_core">
-              Striker Core (Cmp + Fin + OtB + Pac / Value)
-              <p>Current Value: <span>4</span></p>
-              <input type="range" min="1" max="10" value="4" id="str_core" name="str_core" oninput="updateSpanValue(this)">
-            </label>
-            <label for="str_secondary">
-              Winger Secondary (Acc + Agi + Ant + Bal + Dec + Dri + Fir + Pas + Sta + Tec + Wor / Value)
-              <p>Current Value: <span>11</span></p>
-              <input type="range" min="1" max="20" value="11" id="str_secondary" name="str_secondary" oninput="updateSpanValue(this)">
-            </label>
-          </details>
-        </div>
       </form>
     </div>
   </main>
   <script>
-    function showWeights() {
-      document.getElementById("weight-button").classList.add("hidden")
-      document.getElementById("weight-container").classList.remove("hidden")
-    }
-  </script>
-  <script>
-    const maxAllowed = 5;
+    const maxAllowed = 8;
     const checkboxes = document.querySelectorAll('input[type="checkbox"]');
   
     checkboxes.forEach(checkbox => {
@@ -234,12 +54,6 @@
         }
       });
     });
-  </script>
-  <script>
-    function updateSpanValue(inputElement) {
-      const closestSpan = inputElement.previousElementSibling.querySelector('span')
-      closestSpan.textContent = inputElement.value;
-  }
   </script>
 </body>
 </html>

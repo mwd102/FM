@@ -16,15 +16,100 @@ app.secret_key = os.environ.get("SECRET_KEY")
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    function_names = {
+        'calculate_advanced_forward_attack':  ('Advanced Forward - Attack', 'afa'),
+        'calculate_advanced_playmaker_attack':  ('Advanced Playmaker - Attack', 'apa'),
+        'calculate_advanced_playmaker_support':  ('Advanced Playmaker - Support', 'aps'),
+        'calculate_anchor_defend':  ('Anchor - Defend', 'ad'),
+        'calculate_attacking_midfielder_attack':  ('Attacking Midfielder - Attack', 'ama'),
+        'calculate_attacking_midfielder_support':  ('Attacking Midfielder - Support', 'ams'),
+        'calculate_ball_playing_defender_cover':  ('Ball Playing Defender - Cover', 'bpdc'),
+        'calculate_ball_playing_defender_defend':  ('Ball Playing Defender - Defend', 'bpdd'),
+        'calculate_ball_playing_defender_stopper':  ('Ball Playing Defender - Stopper', 'bpds'),
+        'calculate_ball_winning_midfielder_defend':  ('Ball Winning Midfielder - Defend', 'bwmd'),
+        'calculate_ball_winning_midfielder_support':  ('Ball Winning Midfielder - Support', 'bwms'),
+        'calculate_box_to_box_midfielder_support':  ('Box to Box Midfielder - Support', 'b2bs'),
+        'calculate_carrilero_support':  ('Carrilero - Support', 'cars'),
+        'calculate_central_defender_cover':  ('Central Defender - Cover', 'cdc'),
+        'calculate_central_defender_defend':  ('Central Defender - Defend', 'cdd'),
+        'calculate_central_defender_stopper':  ('Central Defender - Stopper', 'cds'),
+        'calculate_central_midfielder_attack':  ('Central Midfielder - Attack', 'cma'),
+        'calculate_central_midfielder_defend':  ('Central Midfielder - Defend', 'cmd'),
+        'calculate_central_midfielder_support':  ('Central  Midfielder - Support', 'cms'),
+        'calculate_complete_forward_attack':  ('Complete Forward - Attack', 'cfa'),
+        'calculate_complete_forward_support':  ('Complete Forward - Support', 'cfs'),
+        'calculate_complete_wing_back_attack':  ('Complete Wingback - Attack', 'cwba'),
+        'calculate_complete_wing_back_support':  ('Complete Wingback - Support', 'cwbs'),
+        'calculate_deep_lying_forward_attack':  ('Deep Lying Forward - Attack', 'dlfa'),
+        'calculate_deep_lying_forward_support':  ('Deep Lying Forward - Support', 'dlfs'),
+        'calculate_deep_lying_playmaker_defend':  ('Deep Lying Playmaker - Defend', 'dlpd'),
+        'calculate_deep_lying_playmaker_support':  ('Deep Lying Playmaker - Support', 'dlps'),
+        'calculate_defensive_midfielder_defend':  ('Defensive Midfielder - Defend', 'dmd'),
+        'calculate_defensive_midfielder_support':  ('Defensive Midfielder - Support', 'dms'),
+        'calculate_defensive_winger_defend':  ('Defensive Winger - Defend', 'dwd'),
+        'calculate_defensive_winger_support':  ('Defense Winger - Support', 'dws'),
+        'calculate_false_nine_support':  ('False Nine - Support', 'f9s'),
+        'calculate_full_back_attack':  ('Fullback - Attack', 'fba'),
+        'calculate_full_back_defend':  ('Fullback - Defend', 'fbd'),
+        'calculate_full_back_support':  ('Fullback - Support', 'fbs'),
+        'calculate_goalkeeper_defend':  ('GK - Defend', 'gkd'),
+        'calculate_half_back_defend':  ('Half Back - Defend', 'hbd'),
+        'calculate_inverted_full_back_defend':  ('Inverted Fullback - Defend', 'ifbd'),
+        'calculate_inverted_winger_attack':  ('Inverted Winger - Attack', 'iwa'),
+        'calculate_inverted_winger_support':  ('Inverted Winger - Support', 'iws'),
+        'calculate_inverted_wing_back_attack':  ('Inverted Wingback - Attack', 'iwba'),
+        'calculate_inverted_wing_back_defend':  ('Inverted Wingback - Defend', 'iwbd'),
+        'calculate_inverted_wing_back_support':  ('Inverted Wingback - Support', 'iwbs'),
+        'calculate_libero_defend':  ('Libero - Defend', 'ld'),
+        'calculate_libero_support':  ('Libero - Support', 'ls'),
+        'calculate_mezzala_attack':  ('Mezzala - Attack', 'meza'),
+        'calculate_mezzala_support':  ('Mezzala - Support', 'mezs'),
+        'calculate_nononsense_centre_back_cover':  ('No-Nonsense Centreback - Cover', 'ncbc'),
+        'calculate_nononsense_centre_back_defend':  ('No-Nonsense Centreback - Defend', 'ncbd'),
+        'calculate_nononsense_centre_back_stopper':  ('No-Nonsense Centreback - Stopper', 'ncbs'),
+        'calculate_nononsense_full_back_defend':  ('No-Nonsense Fullback - Defend', 'nfbd'),
+        'calculate_poacher_attack':  ('Poacher - Attack', 'pa'),
+        'calculate_pressing_forward_attack':  ('Pressing Forward- Attack', 'pfa'),
+        'calculate_pressing_forward_defend':  ('Pressing Forward - Defend', 'pfd'),
+        'calculate_pressing_forward_support':  ('Pressing Forward - Support', 'pfs'),
+        'calculate_raumdeuter_attack':  ('Raumdeuter - Attack', 'raua'),
+        'calculate_regista_support':  ('Regista - Support', 'regs'),
+        'calculate_roaming_playmaker_support':  ('Roaming Playmaker - Support', 'rps'),
+        'calculate_segundo_volante_attack':  ('Segundo Volante - Attack', 'sva'),
+        'calculate_segundo_volante_support':  ('Segundo Volante - Support', 'svs'),
+        'calculate_shadow_striker_attack':  ('Shadow Striker - Attack', 'ssa'),
+        'calculate_sweeper_keeper_attack':  ('Sweeper Keeper - Attack', 'ska'),
+        'calculate_sweeper_keeper_defend':  ('Sweeper Keeper - Defend', 'skd'),
+        'calculate_sweeper_keeper_support':  ('Sweeper Keeper - Support', 'sks'),
+        'calculate_target_forward_attack':  ('Target Forward - Attack', 'tfa'),
+        'calculate_target_forward_support':  ('Target Forward - Support', 'tfs'),
+        'calculate_trequartista_attack':  ('Trequartista - Attack', 'trea'),
+        'calculate_wide_centre_back_attack':  ('Wide Centreback - Attack', 'wcba'),
+        'calculate_wide_centre_back_defend':  ('Wide Centreback - Defend', 'wcbd'),
+        'calculate_wide_centre_back_support':  ('Wide Centreback - Support', 'wcbs'),
+        'calculate_wide_midfielder_attack':  ('Wide Midfielder - Attack', 'wma'),
+        'calculate_wide_midfielder_defend':  ('Wide Midfielder - Defend', 'wmd'),
+        'calculate_wide_midfielder_support':  ('Wide Midfielder - Support', 'wms'),
+        'calculate_wide_playmaker_attack':  ('Wide Playmaker - Attack', 'wpa'),
+        'calculate_wide_playmaker_support':  ('Wide Playmaker - Support', 'wps'),
+        'calculate_wide_target_forward_attack':  ('Wide Target Forward - Attack', 'wtfa'),
+        'calculate_wide_target_forward_support':  ('Wide Target Forward - Support', 'wtfs'),
+        'calculate_winger_attack':  ('Winger - Attack', 'wa'),
+        'calculate_winger_support':  ('Winger - Support', 'ws'),
+        'calculate_wing_back_attack':  ('Wingback - Attack', 'wba'),
+        'calculate_wing_back_defend':  ('Wingback - Defend', 'wbd'),
+        'calculate_wing_back_support':  ('Wingback - Support', 'wbs'),
+    }
+
+    return render_template('index.html', function_names=function_names)
 
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
     try:
         if 'file' not in request.files:
-                flash('No file part.', 'error')
-                return redirect(url_for('index'))
+            flash('No file part.', 'error')
+            return redirect(url_for('index'))
 
         file = request.files['file']
 
@@ -35,70 +120,45 @@ def upload_file():
         if file:
             try:
                 form_data = request.form.to_dict()
+                print(form_data)
 
-                selected_options = [form_data[key] for key in form_data.keys() if key.startswith('option')]
-                if not selected_options:
+                selected_options = []
+                data_calc_values = []
+
+                for key, value in form_data.items():
+                    data_calc_values.append(key)
+                    selected_options.append(value)
+
+                print(selected_options)
+                print(data_calc_values)
+
+                if not data_calc_values:
                     flash('At least one checkbox must be selected.', 'error')
                     return redirect(url_for('index'))
+
+                # List containing selected functions to be run
+                calculation_functions = [
+                    calculate_speed_workrate_score  # Always include this function
+                ]
+
+                # Iterate over selected function names and dynamically add them to the list
+                for option in selected_options:
+                    try:
+                        function_name = option
+                        # Fetch the function by name and add it to the list
+                        calculation_functions.append(getattr(__import__('calculate_functions'), function_name))
+                    except AttributeError:
+                        flash(f'Function not found: {function_name}', 'error')
+                        return redirect(url_for('index'))
+
                 # Read the uploaded HTML file using Pandas
                 # This assumes the HTML file contains tables
-                squad_rawdata_list = pd.read_html(
-                    file, header=0, encoding='utf-8')
-
+                squad_rawdata_list = pd.read_html(file, header=0, encoding='utf-8')
                 squad_rawdata = squad_rawdata_list[0]
 
-                #Calculate Speed & Workrate Score
-                speed = int(request.form['speed'])
-                workrate = int(request.form['workrate'])
-                setp = int(request.form['setp'])
-                squad_rawdata = calculate_speed_workrate_score(squad_rawdata, speed, workrate, setp)
-
-                #Calculate GK Score
-                gk_essential = int(request.form['gk_essential'])
-                gk_core = int(request.form['gk_core'])
-                gk_secondary = int(request.form['gk_secondary'])
-                squad_rawdata = calculate_gk_score(squad_rawdata, gk_essential, gk_core, gk_secondary)
-
-                #Calculate FB Score
-                fb_essential = int(request.form['fb_essential'])
-                fb_core = int(request.form['fb_core'])
-                fb_secondary = int(request.form['fb_secondary'])
-                squad_rawdata = calculate_fb_score(squad_rawdata, fb_essential, fb_core, fb_secondary)
-
-                #Calculate CB Score
-                cb_core = int(request.form['cb_core'])
-                cb_secondary = int(request.form['cb_secondary'])
-                squad_rawdata = calculate_cb_score(squad_rawdata, cb_core, cb_secondary)
-
-                #Calculate DM Score
-                dm_core = int(request.form['dm_core'])
-                squad_rawdata = calculate_dm_score(squad_rawdata, dm_core)
-
-                #Calculate SV Score
-                sv_core = int(request.form['sv_core'])
-                squad_rawdata = calculate_segundo_volante_score(squad_rawdata, sv_core)
-
-                #Calculate B2B Score
-                b2b_core = int(request.form['b2b_core'])
-                squad_rawdata = calculate_box2box_score(squad_rawdata, b2b_core)
-                
-                #Calculate W Score
-                wing_core = int(request.form['wing_core'])
-                wing_secondary = int(request.form['wing_secondary'])
-                squad_rawdata = calculate_winger_score(squad_rawdata, wing_core, wing_secondary)
-
-                #Calculate IW Score
-                iw_core = int(request.form['iw_core'])
-                squad_rawdata = calculate_inverted_winger_score(squad_rawdata, iw_core)
-
-                #Calculate AMC Score
-                amc_core = int(request.form['amc_core'])
-                squad_rawdata = calculate_amc_score(squad_rawdata, amc_core)
-
-                #Calculate STR Score
-                str_core = int(request.form['str_core'])
-                str_secondary = int(request.form['str_secondary'])
-                squad_rawdata = calculate_striker_score(squad_rawdata, str_core, str_secondary)
+                # Run the selected functions on the data
+                for calculation_function in calculation_functions:
+                    squad_rawdata = calculation_function(squad_rawdata)
 
                 # Builds Squad Dataframe using only columns
                 # that will be exported to HTML
@@ -106,7 +166,7 @@ def upload_file():
                     'Inf', 'Name', 'Age', 'Club', 'Transfer Value', 'Wage',
                     'Nat', 'Position', 'Personality', 'Media Handling',
                     'Left Foot', 'Right Foot', 'Spd', 'Jum', 'Str', 'Work',
-                    'Height'] + selected_options]
+                    'Height'] + data_calc_values]
 
                 html = generate_html(squad)
 
@@ -182,4 +242,4 @@ def generate_html(dataframe: pd.DataFrame):
 if __name__ == "__main__":
     app.run(host=os.environ.get("IP"),
             port=int(os.environ.get("PORT")),
-            debug=True)
+            debug=False)
