@@ -11,7 +11,11 @@
   <main>
     <div class="container">
       <h1>FM24 Player recruitment Using Python</h1>
-      <p>Based on <a href="https://www.youtube.com/watch?v=hnAuOakqR90" target="_blank">this video</a> by <a href="https://twitter.com/playingsquirrel" target="_blank">squirrel_plays</a></p>
+      <p>
+        Based on <a href="https://www.youtube.com/watch?v=hnAuOakqR90" target="_blank">this video</a>
+        by <a href="https://twitter.com/playingsquirrel" target="_blank">squirrel_plays</a>.
+        Values in brackets <code>(afa)</code> are what will be shown in the returned table.
+      </p>
       <form method="POST" enctype="multipart/form-data" action="/upload">
         <input type="file" name="file">
         <hr>
@@ -22,7 +26,7 @@
             {% for function_name, values in function_names.items() %}
             <li>
               <label>
-                <input type="checkbox" name="{{values.1}}" value="{{ function_name }}">{{values.0}}<br>
+                <input type="checkbox" name="{{values.1}}" value="{{ function_name }}">{{values.0}} ({{values.1}})<br>
               </label>
             </li>
             {% endfor %}

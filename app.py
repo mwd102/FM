@@ -120,7 +120,6 @@ def upload_file():
         if file:
             try:
                 form_data = request.form.to_dict()
-                print(form_data)
 
                 selected_options = []
                 data_calc_values = []
@@ -128,9 +127,6 @@ def upload_file():
                 for key, value in form_data.items():
                     data_calc_values.append(key)
                     selected_options.append(value)
-
-                print(selected_options)
-                print(data_calc_values)
 
                 if not data_calc_values:
                     flash('At least one checkbox must be selected.', 'error')
