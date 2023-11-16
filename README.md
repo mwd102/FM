@@ -15,7 +15,7 @@ This assumes you have Python installed on your PC already.
 * Select Code > Download ZIP or [click here](https://github.com/Fatheed7/FM/archive/refs/heads/main.zip)
 * Extract files to a new folder on your PC
 * Open the folder in your preferred IDE or Command prompt.
-* Run the command `pip install -r requirement.txt`
+* Run the command `pip install -r requirements.txt`
 * Once the packages have been installed, run `python3 app.py` or `python app.py`
 * Done
 
