@@ -1,7 +1,7 @@
 from flask import (
     Flask, request, render_template,
-    redirect, make_response, url_for,
-    flash
+    redirect, make_response, session, url_for,
+    flash, jsonify
     )
 import os
 import pandas as pd
@@ -9,10 +9,13 @@ import pandas as pd
 if os.path.exists("env.py"):
     import env
 
+
 from calculate_functions import *
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY")
+
+data_list = []
 
 @app.route('/')
 def index():
@@ -100,9 +103,12 @@ def index():
         'calculate_wing_back_defend':  ('Wingback - Defend', 'wbd'),
         'calculate_wing_back_support':  ('Wingback - Support', 'wbs'),
     }
+    selected_options = session.get('selected_options', [])
+    return render_template('index.html',function_names=function_names, selected_options=selected_options)
 
-    return render_template('index.html', function_names=function_names)
-
+@app.route('/get_data')
+def get_data():
+    return jsonify(data_list)
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
@@ -164,11 +170,12 @@ def upload_file():
                     'Left Foot', 'Right Foot', 'Spd', 'Jum', 'Str', 'Work',
                     'Height'] + data_calc_values]
 
-                html = generate_html(squad)
+                global data_list
+                data_list = squad.fillna('').to_dict(orient='records')
 
-                response = make_response(html)
-                response.headers['Content-Type'] = 'text/html'
-                return response
+                session['selected_options'] = selected_options
+                return redirect(url_for('index'))
+
             except ValueError as ve:
                 return render_template("error.html", error=ve)
     except Exception as e:
