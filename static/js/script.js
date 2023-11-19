@@ -56,27 +56,42 @@ function fetchDataAndDisplayTable() {
 }
 
 function buildTable(data) {
-  let table = '<table role="grid" id="data-table" class="table table-striped table-bordered">';
-
-  if (data.length > 0) {
+    let table = '<table role="grid" id="data-table" class="table table-striped table-bordered">';
+  
+    const staticColumns = [
+        'Inf', 'Name', 'Age', 'Club', 'Transfer Value', 'Wage', 'Nat', 'Position',
+         'Personality', 'Media Handling', 'Left Foot', 'Right Foot', 'Spd', 'Jum',
+          'Str', 'Work', 'Height'];
+  
+    // Extract unique columns from data
+    const dynamicColumns = [...new Set(data.flatMap(row => Object.keys(row).filter(key => !staticColumns.includes(key))))];
+  
+    // Combine static and dynamic columns to create the order
+    const columnOrder = staticColumns.concat(dynamicColumns);
+  
+    if (data.length > 0) {
       table += '<thead><tr>';
-      Object.keys(data[0]).forEach((key, index) => {
-          table += `<th scope="col" onclick="sortTable(${index})" style="cursor:pointer;"><b>${key}</b></th>`;
+      
+      columnOrder.forEach((key, index) => {
+        table += `<th scope="col" onclick="sortTable(${index})" style="cursor:pointer;"><b>${key}</b></th>`;
       });
+      
       table += '</tr></thead>';
-  }
-
-  table += '<tbody>';
-  data.forEach(row => {
+    }
+  
+    table += '<tbody>';
+    data.forEach(row => {
       table += '<tr>';
-      Object.values(row).forEach(value => {
-          table += `<td>${value}</td>`;
+      columnOrder.forEach(key => {
+        table += `<td>${row[key] || ''}</td>`;
       });
       table += '</tr>';
-  });
-  table += '</tbody></table>';
-  return table;
-}
+    });
+    table += '</tbody></table>';
+    return table;
+  }
+  
+  
 
 function sortTable(columnIndex) {
   var table, rows, switching, i, shouldSwitch, direction, switchcount = 0;
