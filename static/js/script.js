@@ -4,41 +4,61 @@ var sortDirections = [];
 const selectedRolesContainer = document.getElementById('selected-roles');
 
 
-checkboxes.forEach(checkbox => {
-  checkbox.addEventListener('change', function() {
-    let checkedCount = document.querySelectorAll('input[type="checkbox"]:checked').length;
-    if (checkedCount > maxAllowed) {
-      this.checked = false;
-    }
-    updateSummary();
-  });
-});
-
-
-function updateSummary() {
-  const selectedRolesContainer = document.getElementById('selected-roles');
-  selectedRolesContainer.innerHTML = '';
-
-  const selectedCheckboxes = Array.from(checkboxes).filter(checkbox => checkbox.checked);
-
-  if (selectedCheckboxes.length > 0) {
-      selectedCheckboxes.forEach(checkbox => {
-          const pill = document.createElement('span');
-          pill.textContent = checkbox.nextSibling.textContent.trim();
-          pill.classList.add('pill');
-          pill.onclick = function() {
-              checkbox.checked = false;
-              updateSummary();
-          };
-          selectedRolesContainer.appendChild(pill);
-      });
-      document.getElementById("roleCount").textContent = selectedCheckboxes.length
-  } else {
-        document.getElementById("roleCount").textContent = "0"
-        selectedRolesContainer.innerHTML = '<span class="pill">No roles selected</span>';
-  }
+function updateLocalStorage() {
+    const savedCheckboxes = Array.from(checkboxes).map(checkbox => ({
+        value: checkbox.value,
+        checked: checkbox.checked
+    }));
+    localStorage.setItem('selectedCheckboxes', JSON.stringify(savedCheckboxes));
 }
 
+function restoreCheckboxesState() {
+    const savedCheckboxes = JSON.parse(localStorage.getItem('selectedCheckboxes'));
+    if (savedCheckboxes) {
+        savedCheckboxes.forEach(savedCheckbox => {
+            const checkbox = Array.from(checkboxes).find(c => c.value === savedCheckbox.value);
+            if (checkbox) {
+                checkbox.checked = savedCheckbox.checked;
+            }
+        });
+        updateSummary();
+    }
+}
+
+checkboxes.forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+        let checkedCount = document.querySelectorAll('#roleField input[type="checkbox"]:checked').length;
+        if (checkedCount > maxAllowed) {
+            this.checked = false;
+        }
+        updateSummary();
+        updateLocalStorage();
+    });
+});
+
+function updateSummary() {
+    const selectedRolesContainer = document.getElementById('selected-roles');
+    selectedRolesContainer.innerHTML = '';
+    const selectedCheckboxes = Array.from(checkboxes).filter(checkbox => checkbox.checked);
+
+    if (selectedCheckboxes.length > 0) {
+        selectedCheckboxes.forEach(checkbox => {
+            const pill = document.createElement('span');
+            pill.textContent = checkbox.nextSibling.textContent.trim();
+            pill.classList.add('pill');
+            pill.onclick = function() {
+                checkbox.checked = false;
+                updateSummary();
+                updateLocalStorage();
+            };
+            selectedRolesContainer.appendChild(pill);
+        });
+    } else {
+        selectedRolesContainer.innerHTML = '<span class="pill">No roles selected</span>';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', restoreCheckboxesState);
 
 function fetchDataAndDisplayTable() {
   fetch('/get_data')
