@@ -23,7 +23,7 @@ This assumes you have Python installed on your PC already.
 
 * Click the `<> Code` button above, and select `Codespaces`
 * Click `Create codespace on main`
-* Run the command `pip install -r requirement.txt`
+* Run the command `pip install -r requirements.txt`
 * Once the packages have been installed, run `python3 app.py`
 * Done
 
