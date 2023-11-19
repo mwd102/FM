@@ -31,3 +31,9 @@
 .pill:hover {
     opacity: 0.8;
 }
+
+.table-container{
+    margin: 5px;
+    padding: 5px;
+
+}
