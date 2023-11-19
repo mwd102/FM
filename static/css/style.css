@@ -19,6 +19,18 @@
     opacity: 0.8;
 }
 
+.table-container{
+    margin: 5px;
+    padding: 5px;
+
+}
+
+.table-container{
+    margin: 5px;
+    padding: 5px;
+
+}
+
 th {
     background: white;
     position: sticky;
@@ -56,14 +68,20 @@ table {
     border-color: var(--bs-table-border-color);
 }
 
-main {
-    padding: calc(1rem * 3.5) 0;
-}
-
 h1 {
     margin-bottom: 3rem;
 }
 
 li {
     list-style: none;
+}
+
+nav ul {
+    margin-top: 1rem !important;
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
