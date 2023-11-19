@@ -110,6 +110,11 @@ def index():
 def get_data():
     return jsonify(data_list)
 
+@app.route('/clear_data')
+def clear_data():
+    data_list.clear()
+    return jsonify({'message': 'Data list cleared successfully'})
+
 @app.route('/upload', methods=['POST'])
 def upload_file():
     try:
@@ -174,6 +179,7 @@ def upload_file():
                 data_list = squad.fillna('').to_dict(orient='records')
 
                 session['selected_options'] = selected_options
+                
                 return redirect(url_for('index'))
 
             except ValueError as ve:
@@ -186,60 +192,6 @@ def upload_file():
 def invalid_route(invalid_route):
     # Route back to index page on invalid route
     return redirect(url_for('index'))
-
-
-def generate_html(dataframe: pd.DataFrame):
-    # Get the table HTML from the dataframe
-    table_html = dataframe.to_html(table_id="table", index=False, na_rep='')
-
-    # Construct the HTML with jQuery Data tables
-    html = f"""
-    <html>
-    <header>
-        <meta charset="utf-8">
-        <link href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" rel="stylesheet">
-        <title>Processed FM Data</title>
-    </header>
-    <body>
-        <button id="downloadButton">Download HTML</button>
-        {table_html}
-        <script src="https://code.jquery.com/jquery-3.6.0.slim.min.js"
-            integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI="
-            crossorigin="anonymous"></script>
-        <script type="text/javascript" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-        <script>
-            $(document).ready(function () {{
-                $('#table').DataTable({{
-                    paging: false,
-                    order: [[12, 'desc']],
-                    // scrollY: 400,
-                }});
-
-                // Add click event listener to the download button
-                document.getElementById('downloadButton').addEventListener('click', function () {{
-                    // Create a Blob containing the HTML content
-                    var blob = new Blob(['<!DOCTYPE html><html>' +
-                    document.documentElement.outerHTML + '</html>'], {{ type: 'text/html' }});
-                    // Create a temporary URL for the Blob
-                    var url = URL.createObjectURL(blob);
-                    // Create a download link and trigger a click event to download the file
-                    var a = document.createElement('a');
-                    a.href = url;
-                    a.download = 'processed_data.html';
-                    document.body.appendChild(a);
-                    a.click();
-                    // Clean up the temporary URL and remove the download link
-                    window.URL.revokeObjectURL(url);
-                    document.body.removeChild(a);
-                }});
-            }});
-        </script>
-    </body>
-    </html>
-    """
-    # Return the HTML as bytes
-    return html.encode('utf-8')
-
 
 
 if __name__ == "__main__":

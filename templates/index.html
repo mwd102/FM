@@ -4,7 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FM24 Player Recruitment</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+  <link 
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" 
+    rel="stylesheet" 
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" 
+    crossorigin="anonymous"
+  >
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css')}}" />
 </head>
 <body>
@@ -17,21 +22,21 @@
         Values in brackets <code>(afa)</code> are what will be shown in the returned table.
       </p>
       <form method="POST" enctype="multipart/form-data" action="/upload">
-        <input type="file" name="file">
+        <input class="form-control" type="file" name="file">
         <hr>
         <figure>
-          <p>Select Roles to Display: (8 Max)</p>
+          <p>Select Roles to Display: (8 Max) - <span id="roleCount">0</span> / 8 Selected</p>
           <div id="selected-roles">
   
           </div>
         </figure>
         <details role="list">
-          <summary aria-haspopup="listbox">Select up to 8 roles</summary>
+          <summary aria-haspopup="listbox">Select Player Roles</summary>
           <ul role="listbox" id="roleField">
             {% for function_name, values in function_names.items() %}
             <li>
                 <label>
-                    <input type="checkbox" name="{{ values.1 }}" value="{{ function_name }}"
+                    <input class="form-check-input" type="checkbox" name="{{ values.1 }}" value="{{ function_name }}"
                            {% if values.1 in selected_options %} checked {% endif %}>
                     {{ values.0 }} ({{ values.1 }})
                 </label>
@@ -49,140 +54,24 @@
             </ul>
           {% endif %}
         {% endwith %}
-        <input type="submit" value="Upload">
+        <input class="btn btn-primary" type="submit" value="Upload">
       </form>
       <hr>
+    </div>
+    <div class="wrapper">
       <figure>
         <div id="data-table-container">
         </div>
       </figure> 
     </div>
   </main>
-  <script>
-    const maxAllowed = 8;
-    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-    var sortDirections = [];
-    const selectedRolesContainer = document.getElementById('selected-roles');
-
-  
-    checkboxes.forEach(checkbox => {
-      checkbox.addEventListener('change', function() {
-        let checkedCount = document.querySelectorAll('input[type="checkbox"]:checked').length;
-        if (checkedCount > maxAllowed) {
-          this.checked = false;
-        }
-        updateSummary();
-      });
-    });
-
-    
-    function updateSummary() {
-      const selectedRolesContainer = document.getElementById('selected-roles');
-      selectedRolesContainer.innerHTML = '';
-
-      const selectedCheckboxes = Array.from(checkboxes).filter(checkbox => checkbox.checked);
-
-      if (selectedCheckboxes.length > 0) {
-          selectedCheckboxes.forEach(checkbox => {
-              const pill = document.createElement('span');
-              pill.textContent = checkbox.nextSibling.textContent.trim();
-              pill.classList.add('pill');
-              pill.onclick = function() {
-                  checkbox.checked = false;
-                  updateSummary();
-              };
-              selectedRolesContainer.appendChild(pill);
-          });
-      } else {
-          selectedRolesContainer.innerHTML = '<span class="pill">No roles selected</span>';
-      }
-    }
-
-
-    function fetchDataAndDisplayTable() {
-      fetch('/get_data')
-          .then(response => response.json())
-          .then(data => {
-              if (data.length > 0) {
-                  const table = buildTable(data);
-                  document.getElementById('data-table-container').innerHTML = table;
-              } else {
-                  document.getElementById('data-table-container').innerHTML = '';
-              }
-          })
-          .catch(error => console.error('Error:', error));
-    }
-
-    function buildTable(data) {
-      let table = '<table role="grid" id="data-table">';
-
-      if (data.length > 0) {
-          table += '<thead><tr>';
-          Object.keys(data[0]).forEach((key, index) => {
-              table += `<th scope="col" onclick="sortTable(${index})" style="cursor:pointer;"><b>${key}</b></th>`;
-          });
-          table += '</tr></thead>';
-      }
-
-      table += '<tbody>';
-      data.forEach(row => {
-          table += '<tr>';
-          Object.values(row).forEach(value => {
-              table += `<td>${value}</td>`;
-          });
-          table += '</tr>';
-      });
-      table += '</tbody></table>';
-      return table;
-    }
-
-    function sortTable(columnIndex) {
-      var table, rows, switching, i, shouldSwitch, direction, switchcount = 0;
-      table = document.getElementById("data-table");
-      switching = true;
-      direction = sortDirections[columnIndex] || 'descending'; 
-
-      while (switching) {
-          switching = false;
-          rows = table.getElementsByTagName("TR");
-
-          for (i = 1; i < (rows.length - 1); i++) {
-              shouldSwitch = false;
-              x = rows[i].getElementsByTagName("TD")[columnIndex];
-              y = rows[i + 1].getElementsByTagName("TD")[columnIndex];
-
-              var xContent = isNaN(parseFloat(x.innerHTML)) ? x.innerHTML.toLowerCase() : parseFloat(x.innerHTML);
-              var yContent = isNaN(parseFloat(y.innerHTML)) ? y.innerHTML.toLowerCase() : parseFloat(y.innerHTML);
-
-              if (direction === 'ascending') {
-                  if (xContent > yContent) {
-                      shouldSwitch = true;
-                      break;
-                  }
-              } else if (direction === 'descending') {
-                  if (xContent < yContent) {
-                      shouldSwitch = true;
-                      break;
-                  }
-              }
-          }
-          if (shouldSwitch) {
-              rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-              switching = true;
-              switchcount++;
-          } else {
-              if (switchcount === 0 && direction === 'ascending') {
-                  direction = 'descending';
-                  switching = true;
-              }
-          }
-      }
-      sortDirections[columnIndex] = (direction === 'ascending') ? 'descending' : 'ascending';
-    }
-
-
-    updateSummary();
-    fetchDataAndDisplayTable();
+  <script
+    src="{{ url_for('static', filename='js/script.js')}}" defer></script>
+  <script 
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" 
+    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" 
+    crossorigin="anonymous">
   </script>
+  <script src="https://kit.fontawesome.com/346432df9f.js" crossorigin="anonymous"></script>
 </body>
 </html>
