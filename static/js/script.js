@@ -93,13 +93,21 @@ function buildTable(data) {
     const columnOrder = staticColumns.concat(dynamicColumns);
   
     if (data.length > 0) {
-      table += '<thead><tr>';
-      
-      columnOrder.forEach((key, index) => {
-        table += `<th scope="col" onclick="sortTable(${index})" style="cursor:pointer;"><b>${key}</b></th>`;
-      });
-      
-      table += '</tr></thead>';
+        // Header row for column titles
+        table += '<thead><tr>';
+        columnOrder.forEach(key => {
+            table += `<th scope="col"><b>${key}</b></th>`;
+        });
+        table += '</tr>';
+
+        table += '<tr>';
+        columnOrder.forEach((key, index) => {
+            table += `
+                <th scope="col">
+                    <input type="text" class="form-control" onkeyup="filterTable(${index}, this.value)" placeholder="">
+                </th>`;
+        });
+        table += '</tr></thead>';
     }
   
     table += '<tbody>';
@@ -113,6 +121,25 @@ function buildTable(data) {
     table += '</tbody></table>';
     return table;
   }
+
+function filterTable(columnIndex, searchTerm) {
+    var table, tr, td, i, txtValue;
+    table = document.getElementById("data-table");
+    tr = table.getElementsByTagName("tr");
+    searchTerm = searchTerm.toUpperCase();
+
+    for (i = 1; i < tr.length; i++) {
+        td = tr[i].getElementsByTagName("td")[columnIndex];
+        if (td) {
+            txtValue = td.textContent || td.innerText;
+            if (txtValue.toUpperCase().indexOf(searchTerm) > -1) {
+                tr[i].style.display = "";
+            } else {
+                tr[i].style.display = "none";
+            }
+        }
+    }
+}
   
   
 
