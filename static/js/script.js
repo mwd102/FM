@@ -106,7 +106,7 @@ function buildTable(data) {
         columnOrder.forEach((key, index) => {
             table += `
                 <th scope="col">
-                    <input type="text" class="form-control" onkeyup="filterTable(${index}, this.value)" placeholder="<i class="fa fa-search" aria-hidden="true"></i>">
+                    <input type="text" class="form-control" onkeyup="filterTable(${index}, this.value)" placeholder="">
                 </th>`;
         });
         table += '</tr></thead>';
