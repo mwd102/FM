@@ -3,7 +3,6 @@ const checkboxes = document.querySelectorAll('input[type="checkbox"]');
 var sortDirections = [];
 const selectedRolesContainer = document.getElementById('selected-roles');
 
-
 function updateLocalStorage() {
     const savedCheckboxes = Array.from(checkboxes).map(checkbox => ({
         value: checkbox.value,
@@ -53,8 +52,10 @@ function updateSummary() {
             };
             selectedRolesContainer.appendChild(pill);
         });
+        document.getElementById("roleCount").textContent = selectedCheckboxes.length;
     } else {
         selectedRolesContainer.innerHTML = '<span class="pill">No roles selected</span>';
+        document.getElementById("roleCount").textContent = "0";
     }
 }
 
@@ -67,7 +68,7 @@ function fetchDataAndDisplayTable() {
           if (data.length > 0) {
               const table = buildTable(data);
               document.getElementById('data-table-container').innerHTML = table;
-              fetch('/clear_data')
+              fetch('/clear_data');
           } else {
               document.getElementById('data-table-container').innerHTML = '';
           }
@@ -155,6 +156,23 @@ function sortTable(columnIndex) {
       }
   }
   sortDirections[columnIndex] = (direction === 'ascending') ? 'descending' : 'ascending';
+}
+
+//Toggle Light/Dark Mode
+function modeToggle() {
+    let element = document.body;
+    let modeButton = document.getElementById("modeToggle");
+    if (element.dataset.bsTheme == "light") {
+        element.dataset.bsTheme = "dark";
+        modeButton.classList.remove("btn-dark");
+        modeButton.classList.add("btn-light");
+        modeButton.textContent = "Switch to Light Mode";
+    } else {
+        element.dataset.bsTheme = "light";
+        modeButton.classList.remove("btn-light");
+        modeButton.classList.add("btn-dark");
+        modeButton.textContent = "Switch to Dark Mode";
+    }
 }
 
 updateSummary();
