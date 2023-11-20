@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
     document.getElementById("modeToggle").addEventListener("click", modeToggle);
 });
 
+
 function updateLocalStorage() {
     const savedCheckboxes = Array.from(checkboxes).map(checkbox => ({
         value: checkbox.value,
@@ -93,7 +94,8 @@ function buildTable(data) {
     const columnOrder = staticColumns.concat(dynamicColumns);
   
     if (data.length > 0) {
-        // Header row for column titles
+        
+        showExportButton();
         table += '<thead><tr>';
         columnOrder.forEach((key, index) => {
             table += `<th scope="col" onclick="sortTable(${index})" style="cursor:pointer;"><i class="fa-solid fa-sort fa-2xs"></i><br><b>${key}</b></th>`;
@@ -120,7 +122,63 @@ function buildTable(data) {
     });
     table += '</tbody></table>';
     return table;
-  }
+}
+
+  
+
+function exportTableToHTML() {
+    const table = document.getElementById('data-table').cloneNode(true);
+    
+    if (table.tHead.rows.length > 1) {
+        table.tHead.deleteRow(1); //deleting search row...
+    }
+
+    const style = `
+        <style>
+            table {
+                border-collapse: collapse;
+                width: 100%;
+                border: 1px solid #ddd;
+            }
+            th, td {
+                border: 1px solid #ddd;
+                padding: 8px;
+                text-align: left;
+            }
+            th {
+                background-color: #f2f2f2;
+            }
+            tr:nth-child(even) {
+                background-color: #f9f9f9;
+            }
+        </style>
+    `;
+
+
+    const tableHTML = style + table.outerHTML;
+    const filename = 'table_export.html';
+    const blob = new Blob([tableHTML], { type: 'text/html' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+function showExportButton() {
+    const exportButton = document.getElementById('export-button');
+    exportButton.style.display = 'block';
+
+    if (!exportButton.getAttribute('data-click-assigned')) {
+        exportButton.addEventListener('click', function(event) {
+            event.preventDefault(); 
+            exportTableToHTML(); 
+        });
+        exportButton.setAttribute('data-click-assigned', 'true');
+    }
+}
+
 
 function filterTable(columnIndex, searchTerm) {
     var table, tr, td, i, txtValue;
@@ -141,6 +199,7 @@ function filterTable(columnIndex, searchTerm) {
     }
 }
   
+
   
 
 function sortTable(columnIndex) {
