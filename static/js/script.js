@@ -97,9 +97,9 @@ function buildTable(data) {
         
         showExportButton();
         table += '<thead><tr>';
-        columnOrder.forEach(key => {
-            table += `<th scope="col"><b>${key}</b></th>`;
-        });
+        columnOrder.forEach((key, index) => {
+            table += `<th scope="col" onclick="sortTable(${index})" style="cursor:pointer;"><i class="fa-solid fa-sort fa-2xs"></i><br><b>${key}</b></th>`;
+          });
         table += '</tr>';
 
         table += '<tr>';
@@ -203,48 +203,68 @@ function filterTable(columnIndex, searchTerm) {
   
 
 function sortTable(columnIndex) {
-  var table, rows, switching, i, shouldSwitch, direction, switchcount = 0;
-  table = document.getElementById("data-table");
-  switching = true;
-  direction = sortDirections[columnIndex] || 'descending'; 
-
-  while (switching) {
-      switching = false;
-      rows = table.getElementsByTagName("TR");
-
-      for (i = 1; i < (rows.length - 1); i++) {
-          shouldSwitch = false;
-          x = rows[i].getElementsByTagName("TD")[columnIndex];
-          y = rows[i + 1].getElementsByTagName("TD")[columnIndex];
-
-          var xContent = isNaN(parseFloat(x.innerHTML)) ? x.innerHTML.toLowerCase() : parseFloat(x.innerHTML);
-          var yContent = isNaN(parseFloat(y.innerHTML)) ? y.innerHTML.toLowerCase() : parseFloat(y.innerHTML);
-
-          if (direction === 'ascending') {
-              if (xContent > yContent) {
-                  shouldSwitch = true;
-                  break;
-              }
-          } else if (direction === 'descending') {
-              if (xContent < yContent) {
-                  shouldSwitch = true;
-                  break;
-              }
-          }
+    var table, rows, switching, i, shouldSwitch, direction, switchcount = 0;
+    table = document.getElementById("data-table");
+    switching = true;
+    direction = sortDirections[columnIndex] || 'descending';
+  
+    let elements = document.getElementsByClassName("fa-2xs");
+  
+      for (let i = 0; i < elements.length; i++) {
+          let element = elements[i];
+          element.classList.remove("fa-sort-up", "fa-sort-down");
+          element.classList.add("fa-sort");
       }
-      if (shouldSwitch) {
-          rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-          switching = true;
-          switchcount++;
-      } else {
-          if (switchcount === 0 && direction === 'ascending') {
-              direction = 'descending';
-              switching = true;
-          }
-      }
+  
+    while (switching) {
+        switching = false;
+        rows = table.getElementsByTagName("TR");
+  
+        for (i = 1; i < (rows.length - 1); i++) {
+            shouldSwitch = false;
+            x = rows[i].getElementsByTagName("TD")[columnIndex];
+            y = rows[i + 1].getElementsByTagName("TD")[columnIndex];
+        
+            if (x && y) {
+                let xContent = isNaN(parseFloat(x.innerHTML)) ? x.innerHTML.toLowerCase() : parseFloat(x.innerHTML);
+                let yContent = isNaN(parseFloat(y.innerHTML)) ? y.innerHTML.toLowerCase() : parseFloat(y.innerHTML);
+        
+                let iconElement = document.getElementsByClassName("fa-2xs")[columnIndex];
+        
+                if ((direction === 'ascending' && xContent < yContent) ||
+                    (direction === 'descending' && xContent > yContent)) {
+                    shouldSwitch = true;
+        
+                    if (direction === 'ascending') {
+                        iconElement.classList.remove("fa-sort-up", "fa-sort");
+                        iconElement.classList.add("fa-sort-down");
+                    } else {
+                        if (iconElement.classList.contains("fa-sort")) {
+                            iconElement.classList.remove("fa-sort");
+                        } else {
+                            iconElement.classList.remove("fa-sort-down");
+                        }
+                        iconElement.classList.add("fa-sort-up");
+                    }
+                    break;
+                }
+            }
+        }
+        
+        
+        if (shouldSwitch) {
+            rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+            switching = true;
+            switchcount++;
+        } else {
+            if (switchcount === 0 && direction === 'ascending') {
+                direction = 'descending';
+                switching = true;
+            }
+        }
+    }
+    sortDirections[columnIndex] = (direction === 'ascending') ? 'descending' : 'ascending';
   }
-  sortDirections[columnIndex] = (direction === 'ascending') ? 'descending' : 'ascending';
-}
 
 //Toggle Light/Dark Mode
 function modeToggle() {
