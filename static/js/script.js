@@ -3,6 +3,10 @@ const checkboxes = document.querySelectorAll('input[type="checkbox"]');
 var sortDirections = [];
 const selectedRolesContainer = document.getElementById('selected-roles');
 
+document.addEventListener('DOMContentLoaded', (event) => {
+    document.getElementById("modeToggle").addEventListener("click", modeToggle);
+});
+
 function updateLocalStorage() {
     const savedCheckboxes = Array.from(checkboxes).map(checkbox => ({
         value: checkbox.value,
@@ -160,16 +164,16 @@ function sortTable(columnIndex) {
 function modeToggle() {
     let element = document.body;
     let modeButton = document.getElementById("modeToggle");
+    let modeIcon = modeButton.querySelector("i"); // Select the icon inside the button
+
     if (element.dataset.bsTheme == "light") {
         element.dataset.bsTheme = "dark";
-        modeButton.classList.remove("btn-dark");
-        modeButton.classList.add("btn-light");
-        modeButton.textContent = "Switch to Light Mode";
+        modeIcon.classList.remove("fa-moon"); // Remove the moon icon
+        modeIcon.classList.add("fa-sun"); // Add the sun icon
     } else {
         element.dataset.bsTheme = "light";
-        modeButton.classList.remove("btn-light");
-        modeButton.classList.add("btn-dark");
-        modeButton.textContent = "Switch to Dark Mode";
+        modeIcon.classList.remove("fa-sun"); // Remove the sun icon
+        modeIcon.classList.add("fa-moon"); // Add the moon icon
     }
 }
 
