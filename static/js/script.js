@@ -87,11 +87,9 @@ function buildTable(data) {
         'Inf', 'Name', 'Age', 'Club', 'Transfer Value', 'Wage', 'Nat', 'Position',
          'Personality', 'Media Handling', 'Left Foot', 'Right Foot', 'Spd', 'Jum',
           'Str', 'Work', 'Height'];
-  
-    // Extract unique columns from data
-    const dynamicColumns = [...new Set(data.flatMap(row => Object.keys(row).filter(key => !staticColumns.includes(key))))];
-  
-    // Combine static and dynamic columns to create the order
+
+    const dynamicColumns = Array.from(new Set(data.reduce((acc, row) => acc.concat(Object.keys(row)), []).filter(key => !staticColumns.includes(key))));
+
     const columnOrder = staticColumns.concat(dynamicColumns);
   
     if (data.length > 0) {
