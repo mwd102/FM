@@ -25,13 +25,8 @@
 
 }
 
-.table-container{
-    margin: 5px;
-    padding: 5px;
 
-}
-
-th {
+thead {
     background: white;
     position: sticky;
     top: 0; /* Don't forget this, required for the stickiness */
