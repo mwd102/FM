@@ -82,7 +82,7 @@ function fetchDataAndDisplayTable() {
 }
 
 function buildTable(data) {
-    let table = '<table role="grid" id="data-table" class="table table-striped table-bordered">'
+    let table = '<table role="grid" id="data-table" class="table table-striped table-bordered">';
   
     const staticColumns = [
         'Inf', 'Name', 'Age', 'Club', 'Transfer Value', 'Wage', 'Nat', 'Position',
