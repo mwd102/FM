@@ -100,3 +100,15 @@ body {
 th {
     position: relative;
 }
+
+#searchInput {
+    margin: 5px 0 5px 2%;
+    width: 50%;
+}
+
+#clearSearch {
+    position: relative;
+    right: 3%;
+    background: transparent;
+    border: transparent;
+}

@@ -283,5 +283,28 @@ function modeToggle() {
     }
 }
 
+$(document).ready(function () {
+    $("#searchInput").on("input", function () {
+        updateFilter($(this).val().toLowerCase());
+    });
+
+    $("#clearSearch").on("click", function (e) {
+        e.preventDefault()
+        $("#searchInput").val("");
+        updateFilter("");
+    });
+
+    function updateFilter(searchValue) {
+        $(".filter-item").each(function () {
+            var text = $(this).text().toLowerCase();
+            if (text.indexOf(searchValue) === -1) {
+                $(this).hide();
+            } else {
+                $(this).show();
+            }
+        });
+    }
+});
+
 updateSummary();
 fetchDataAndDisplayTable();
