@@ -1,6 +1,7 @@
 const maxAllowed = 8;
 const checkboxes = document.querySelectorAll('input[type="checkbox"]');
 var sortDirections = [];
+let selectionOrder = 0;
 const selectedRolesContainer = document.getElementById('selected-roles');
 
 document.addEventListener('DOMContentLoaded', (event) => {
@@ -11,7 +12,10 @@ document.addEventListener('DOMContentLoaded', (event) => {
 function updateLocalStorage() {
     const savedCheckboxes = Array.from(checkboxes).map(checkbox => ({
         value: checkbox.value,
-        checked: checkbox.checked
+        code: checkbox.dataset.code,
+        checked: checkbox.checked,
+        order: checkbox.checked ? checkbox.dataset.order : null
+
     }));
     localStorage.setItem('selectedCheckboxes', JSON.stringify(savedCheckboxes));
 }
@@ -23,6 +27,9 @@ function restoreCheckboxesState() {
             const checkbox = Array.from(checkboxes).find(c => c.value === savedCheckbox.value);
             if (checkbox) {
                 checkbox.checked = savedCheckbox.checked;
+                if (savedCheckbox.checked) {
+                    checkbox.dataset.order = savedCheckbox.order;
+                }
             }
         });
         updateSummary();
@@ -35,6 +42,10 @@ checkboxes.forEach(checkbox => {
         if (checkedCount > maxAllowed) {
             this.checked = false;
         }
+        else if (this.checked) {
+            const maxOrder = Math.max(0, ...Array.from(checkboxes).filter(cb => cb.checked && cb !== this).map(cb => parseInt(cb.dataset.order || 0, 10)));
+            this.dataset.order = maxOrder + 1;
+        }
         updateSummary();
         updateLocalStorage();
     });
@@ -44,6 +55,7 @@ function updateSummary() {
     const selectedRolesContainer = document.getElementById('selected-roles');
     selectedRolesContainer.innerHTML = '';
     const selectedCheckboxes = Array.from(checkboxes).filter(checkbox => checkbox.checked);
+    selectedCheckboxes.sort((a, b) => (a.dataset.order || 0) - (b.dataset.order || 0));
 
     if (selectedCheckboxes.length > 0) {
         selectedCheckboxes.forEach(checkbox => {
@@ -90,9 +102,23 @@ function buildTable(data) {
          'Personality', 'Media Handling', 'Left Foot', 'Right Foot', 'Spd', 'Jum',
           'Str', 'Work', 'Height'];
 
-    const dynamicColumns = Array.from(new Set(data.reduce((acc, row) => acc.concat(Object.keys(row)), []).filter(key => !staticColumns.includes(key))));
+
+    const savedCheckboxes = JSON.parse(localStorage.getItem('selectedCheckboxes')) || [];
+    const savedOrderMap = new Map(savedCheckboxes.map(item => [item.code, parseInt(item.order, 10)]));
+          
+
+    
+    let dynamicColumns = Array.from(new Set(data.reduce((acc, row) => acc.concat(Object.keys(row)), [])))
+    .filter(key => !staticColumns.includes(key))
+    .sort((a, b) => {
+        const orderA = savedOrderMap.get(a) || 1000;
+        const orderB = savedOrderMap.get(b) || 1000;
+        return orderA - orderB;
+    });
+    
 
     const columnOrder = staticColumns.concat(dynamicColumns);
+      
   
     if (data.length > 0) {
         
