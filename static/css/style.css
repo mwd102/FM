@@ -112,3 +112,8 @@ th {
     background: transparent;
     border: transparent;
 }
+
+select {
+    background: white !important;
+    color: black !important;
+}

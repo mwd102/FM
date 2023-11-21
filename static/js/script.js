@@ -73,6 +73,7 @@ function fetchDataAndDisplayTable() {
           if (data.length > 0) {
               const table = buildTable(data);
               document.getElementById('data-table-container').innerHTML = table;
+              $('#data-table').DataTable();
               fetch('/clear_data');
           } else {
               document.getElementById('data-table-container').innerHTML = '';
@@ -98,18 +99,10 @@ function buildTable(data) {
         showExportButton();
         table += '<thead><tr>';
         columnOrder.forEach((key, index) => {
-            table += `<th scope="col" onclick="sortTable(${index})" style="cursor:pointer;"><i class="fa-solid fa-sort fa-2xs"></i><br><b>${key}</b></th>`;
+            table += `<th scope="col" onclick="sortTable(${index})" style="cursor:pointer;"><b>${key}</b></th>`;
           });
         table += '</tr>';
-
-        table += '<tr>';
-        columnOrder.forEach((key, index) => {
-            table += `
-                <th scope="col">
-                    <input type="text" class="form-control" onkeyup="filterTable(${index}, this.value)" placeholder="">
-                </th>`;
-        });
-        table += '</tr></thead>';
+        table += '</thead>';
     }
   
     table += '<tbody>';
@@ -207,34 +200,40 @@ function sortTable(columnIndex) {
     table = document.getElementById("data-table");
     switching = true;
     direction = sortDirections[columnIndex] || 'descending';
-  
+
+    // Cache elements outside the loop
+    let iconElements = document.getElementsByClassName("fa-2xs");
     let elements = document.getElementsByClassName("fa-2xs");
-  
-      for (let i = 0; i < elements.length; i++) {
-          let element = elements[i];
-          element.classList.remove("fa-sort-up", "fa-sort-down");
-          element.classList.add("fa-sort");
-      }
-  
+
+    for (let i = 0; i < elements.length; i++) {
+        let element = elements[i];
+        element.classList.remove("fa-sort-up", "fa-sort-down");
+        element.classList.add("fa-sort");
+    }
+
+    // Cache rows length
+    rows = table.getElementsByTagName("TR");
+    let rowsLength = rows.length;
+
     while (switching) {
         switching = false;
-        rows = table.getElementsByTagName("TR");
-  
-        for (i = 1; i < (rows.length - 1); i++) {
+
+        for (i = 1; i < (rowsLength - 1); i++) {
             shouldSwitch = false;
             x = rows[i].getElementsByTagName("TD")[columnIndex];
             y = rows[i + 1].getElementsByTagName("TD")[columnIndex];
-        
+
             if (x && y) {
-                let xContent = isNaN(parseFloat(x.innerHTML)) ? x.innerHTML.toLowerCase() : parseFloat(x.innerHTML);
-                let yContent = isNaN(parseFloat(y.innerHTML)) ? y.innerHTML.toLowerCase() : parseFloat(y.innerHTML);
-        
-                let iconElement = document.getElementsByClassName("fa-2xs")[columnIndex];
-        
+                // Use textContent instead of innerHTML
+                let xContent = isNaN(parseFloat(x.textContent)) ? x.textContent.toLowerCase() : parseFloat(x.textContent);
+                let yContent = isNaN(parseFloat(y.textContent)) ? y.textContent.toLowerCase() : parseFloat(y.textContent);
+
+                let iconElement = iconElements[columnIndex];
+
                 if ((direction === 'ascending' && xContent < yContent) ||
                     (direction === 'descending' && xContent > yContent)) {
                     shouldSwitch = true;
-        
+
                     if (direction === 'ascending') {
                         iconElement.classList.remove("fa-sort-up", "fa-sort");
                         iconElement.classList.add("fa-sort-down");
@@ -250,8 +249,7 @@ function sortTable(columnIndex) {
                 }
             }
         }
-        
-        
+
         if (shouldSwitch) {
             rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
             switching = true;
@@ -264,7 +262,7 @@ function sortTable(columnIndex) {
         }
     }
     sortDirections[columnIndex] = (direction === 'ascending') ? 'descending' : 'ascending';
-  }
+}
 
 //Toggle Light/Dark Mode
 function modeToggle() {

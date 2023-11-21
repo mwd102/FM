@@ -11,6 +11,8 @@
     crossorigin="anonymous"
   >
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css')}}">
+  <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+
 </head>
 <body>
   <nav class="navbar container mb-5">
@@ -42,7 +44,7 @@
     <div class="container">
       <h1>FM24 Player Scoring System</h1>
       <p>
-        How to Use: See <a href="https://www.youtube.com/watch?v=DvV9Aigngi8" target="_blank">this video</a> by squirrel_plays. <a href="https://www.mediafire.com/file/ymf6xhw0bk4enjj/FM24_files.zip/file" target="_blank">Click here to download</a> the views needed to export data from FM
+        How to Use: See <a href="https://www.youtube.com/watch?v=DvV9Aigngi8" target="_blank">this video</a> by squirrel_plays. <a href="https://www.mediafire.com/file/ymf6xhw0bk4enjj/FM24_files.zip/file" target="_blank">Click here to download</a> the views needed to export data from FM.
         
       </p>
       <p>
@@ -106,6 +108,7 @@
 <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
 <script
 src="{{ url_for('static', filename='js/script.js')}}"></script>
+<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
 <script 
 src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" 
 integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" 
