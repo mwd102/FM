@@ -16,6 +16,7 @@ from calculate_functions import *
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY")
 
+data_list = []
 
 
 @app.route('/')
@@ -29,12 +30,12 @@ def index():
 
 @app.route('/get_data')
 def get_data():
-    return jsonify(session['data_list'])
+    return jsonify(data_list)
 
 
 @app.route('/clear_data')
 def clear_data():
-    session['data_list'].clear()
+    data_list.clear()
     return jsonify({'message': 'Data list cleared successfully'})
 
 
@@ -114,7 +115,8 @@ def upload_file():
                     'Left Foot', 'Right Foot', 'Spd', 'Jum', 'Str', 'Work',
                     'Height'] + data_calc_values]
 
-                session['data_list'] = squad.fillna('').to_dict(orient='records')
+                global data_list
+                data_list = squad.fillna('').to_dict(orient='records')
 
                 session['selected_options'] = selected_options
 
