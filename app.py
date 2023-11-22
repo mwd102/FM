@@ -94,11 +94,23 @@ def upload_file():
                 # Run the selected functions on the data
                 for calculation_function in calculation_functions:
                     squad_rawdata = calculation_function(squad_rawdata)
+                
+                # Determine earning column
+                if 'Wage' in squad_rawdata.columns:
+                    earnings_column = 'Wage'
+                elif 'Salary' in squad_rawdata.columns:
+                    earnings_column = 'Salary'
+                else:
+                    earnings_column = None
+
+                # Add 'Earnings' to your DataFrame
+                if earnings_column:
+                    squad_rawdata['Earnings'] = squad_rawdata[earnings_column]
 
                 # Builds Squad Dataframe using only columns
                 # that will be exported to HTML
                 squad = squad_rawdata[[
-                    'Inf', 'Name', 'Age', 'Club', 'Transfer Value', 'Wage',
+                    'Inf', 'Name', 'Age', 'Club', 'Transfer Value', 'Earnings',
                     'Nat', 'Position', 'Personality', 'Media Handling',
                     'Left Foot', 'Right Foot', 'Spd', 'Jum', 'Str', 'Work',
                     'Height'] + data_calc_values]
