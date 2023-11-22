@@ -109,7 +109,7 @@ def upload_file():
                 # Builds Squad Dataframe using only columns
                 # that will be exported to HTML
                 squad = squad_rawdata[[
-                    'Inf', 'Name', 'Age', 'Club', 'Transfer Value', 'Earnings',
+                    'Inf', 'Name', 'Age', 'Club', 'Transfer Value', 'Wage',
                     'Nat', 'Position', 'Personality', 'Media Handling',
                     'Left Foot', 'Right Foot', 'Spd', 'Jum', 'Str', 'Work',
                     'Height'] + data_calc_values]
