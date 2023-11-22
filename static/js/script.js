@@ -85,7 +85,9 @@ function fetchDataAndDisplayTable() {
           if (data.length > 0) {
               const table = buildTable(data);
               document.getElementById('data-table-container').innerHTML = table;
-              $('#data-table').DataTable();
+              $('#data-table').DataTable(
+                {"pageLength": 25}
+              );
               fetch('/clear_data');
           } else {
               document.getElementById('data-table-container').innerHTML = '';
