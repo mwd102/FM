@@ -115,7 +115,7 @@ function buildTable(data) {
     let table = '<table role="grid" id="data-table" class="table table-striped table-bordered">';
   
     const staticColumns = [
-        'Inf', 'Name', 'Age', 'Club', 'Transfer Value', 'Wage', 'Nat', 'Position',
+        'Inf', 'Name', 'Age', 'Club', 'Transfer Value', 'Earnings', 'Nat', 'Position',
          'Personality', 'Media Handling', 'Left Foot', 'Right Foot', 'Spd', 'Jum',
           'Str', 'Work', 'Height'];
 
