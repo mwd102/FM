@@ -61,6 +61,8 @@ function_names = {
             'Defensive Winger - Defend', 'dwd'),
         'calculate_defensive_winger_support':  (
             'Defense Winger - Support', 'dws'),
+        'calculate_enganche_support': (
+            'Enganche - Support', 'engs'),
         'calculate_false_nine_support':  (
             'False Nine - Support', 'f9s'),
         'calculate_full_back_attack':  (
