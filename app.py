@@ -103,7 +103,7 @@ def upload_file():
                 else:
                     earnings_column = None
 
-                # Add 'Earnings' to your DataFrame
+                # Add 'Earnings' to the DataFrame
                 if earnings_column:
                     squad_rawdata['Earnings'] = squad_rawdata[earnings_column]
 
