@@ -100,6 +100,33 @@ def upload_file():
                     file, header=0, encoding='utf-8')
                 squad_rawdata = squad_rawdata_list[0]
 
+                
+                # List of columns to include in the check for hyphens
+                included_columns = [
+                     "1v1",  "Acc",  "Aer",  "Agg",  "Agi",  "Ant",  "Bal",  
+                     "Bra",  "Cmd",  "Cnt",  "Cmp",  "Cro",  "Dec",  "Det",  
+                     "Dri",  "Fin",  "Fir",  "Fla",  "Han",  "Hea",  "Jum",  
+                     "Kic",  "Ldr",  "Lon",  "Mar",  "OtB",  "Pac",  "Pas",  
+                     "Pos",  "Ref",  "Sta",  "Str",  "Tck",  "Tea",  "Tec",  
+                     "Thr",  "TRO",  "Vis",  "Wor",  "Cor",  "Com",  "Ecc",  
+                     "Fre",  "L Th",  "Nat",  "Pen",  "Pun"
+                ]
+
+                # Function to check for hyphens in non-excluded columns
+                def check_for_hyphens(row, included_columns):
+                    for col in row.index:
+                        if col in included_columns and '-' in str(row[col]):
+                            return True
+                    return False
+                
+                squad_rawdata['masked_attributes'] = squad_rawdata.apply(check_for_hyphens, axis=1, included_columns=included_columns)
+
+                # Check if any row returns True
+                if squad_rawdata['masked_attributes'].any():
+                    flash('At least one row has an attribute range. Please fully scout the player(s) or disable attribute masking.', 'error')
+                    return redirect(url_for('index'))
+
+
                 # Run the selected functions on the data
                 for calculation_function in calculation_functions:
                     squad_rawdata = calculation_function(squad_rawdata)
