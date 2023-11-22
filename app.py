@@ -6,6 +6,7 @@ from flask import (
 from function_names import function_names
 import os
 import pandas as pd
+from werkzeug.utils import secure_filename
 
 if os.path.exists("env.py"):
     import env
@@ -50,6 +51,14 @@ def upload_file():
 
         if file.filename == '':
             flash('No file selected', 'error')
+            return redirect(url_for('index'))
+        
+        if file.content_length > 2 * 1024 * 1024:
+            flash('File is too large (maximum 2 MB).', 'error')
+            return redirect(url_for('index'))
+
+        if not os.path.splitext(secure_filename(file.filename))[1].lower() == '.html':
+            flash('Invalid file format, only HTML files are allowed.', 'error')
             return redirect(url_for('index'))
 
         if file:
