@@ -96,24 +96,26 @@ def upload_file():
                     squad_rawdata = calculation_function(squad_rawdata)
                 
                 # Determine earning column
-                if 'Wage' in squad_rawdata.columns:
-                    earnings_column = 'Wage'
-                elif 'Salary' in squad_rawdata.columns:
-                    earnings_column = 'Salary'
+                earnings_columns = ['Wage', 'Salary']
+                valid_earnings_columns = squad_rawdata.columns[squad_rawdata.columns.isin(earnings_columns)]
+
+                # Add 'Earnings' to the DataFrame if a valid earnings column is present
+                if len(valid_earnings_columns) > 0:
+                    squad_rawdata['Wage'] = squad_rawdata[valid_earnings_columns[0]]
                 else:
-                    earnings_column = None
+                    # If neither Wage nor Salary is present, create an 'Earnings' column with NaN values
+                    squad_rawdata['Wage'] = None
 
-                # Add 'Earnings' to the DataFrame
-                if earnings_column:
-                    squad_rawdata['Earnings'] = squad_rawdata[earnings_column]
-
-                # Builds Squad Dataframe using only columns
-                # that will be exported to HTML
-                squad = squad_rawdata[[
+                # Columns to export to HTML
+                columns_to_export = [
                     'Inf', 'Name', 'Age', 'Club', 'Transfer Value', 'Wage',
                     'Nat', 'Position', 'Personality', 'Media Handling',
-                    'Left Foot', 'Right Foot', 'Spd', 'Jum', 'Str', 'Work',
-                    'Height'] + data_calc_values]
+                    'Left Foot', 'Right Foot', 'Spd', 'Jum', 'Str', 'Work', 'Height'
+                ] + data_calc_values
+
+                # Builds Squad DataFrame using only specified columns
+                squad = squad_rawdata[columns_to_export]
+
 
                 global data_list
                 data_list = squad.fillna('').to_dict(orient='records')
