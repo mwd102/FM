@@ -73,6 +73,10 @@ function_names = {
             'GK - Defend', 'gkd'),
         'calculate_half_back_defend':  (
             'Half Back - Defend', 'hbd'),
+        'calculate_inside_forward_attack':  (
+            'Inside Forward - Attack', 'ifa'),
+        'calculate_inside_forward_support':  (
+            'Inside Forward - Suport', 'ifs'),
         'calculate_inverted_full_back_defend':  (
             'Inverted Fullback - Defend', 'ifbd'),
         'calculate_inverted_winger_attack':  (
