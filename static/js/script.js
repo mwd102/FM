@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 function updateLocalStorage() {
     const savedCheckboxes = Array.from(checkboxes).map(checkbox => ({
         value: checkbox.value,
+        displayName: checkbox.dataset.name,
         code: checkbox.dataset.code,
         checked: checkbox.checked,
         order: checkbox.checked ? checkbox.dataset.order : null
@@ -108,6 +109,8 @@ function fetchDataAndDisplayTable() {
       .catch(error => console.error('Error:', error));
 }
 
+
+
 function buildTable(data) {
     let table = '<table role="grid" id="data-table" class="table table-striped table-bordered">';
   
@@ -119,8 +122,24 @@ function buildTable(data) {
 
     const savedCheckboxes = JSON.parse(localStorage.getItem('selectedCheckboxes')) || [];
     const savedOrderMap = new Map(savedCheckboxes.map(item => [item.code, parseInt(item.order, 10)]));
-          
+    const displayNameMap = new Map(savedCheckboxes.map(item => [item.code, item.displayName]));
 
+    const staticColumnObjects = staticColumns.map(column => ({
+        code: column,
+        displayName: column
+    }));
+
+    function getColumnObject(columnCode) {
+        const displayName = displayNameMap.has(columnCode) ? displayNameMap.get(columnCode) : columnCode;
+        return {
+            code: columnCode,
+            displayName: displayName
+        };
+    }
+
+
+          
+    console.log(savedCheckboxes);
     
     let dynamicColumns = Array.from(new Set(data.reduce((acc, row) => acc.concat(Object.keys(row)), [])))
     .filter(key => !staticColumns.includes(key))
@@ -128,17 +147,19 @@ function buildTable(data) {
         const orderA = savedOrderMap.get(a) || 1000;
         const orderB = savedOrderMap.get(b) || 1000;
         return orderA - orderB;
-    });
+    })
+    .map(getColumnObject);
+
     
 
-    const columnOrder = staticColumns.concat(dynamicColumns);
+    const columnOrder = staticColumnObjects.concat(dynamicColumns);
       
   
     if (data.length > 0) {
         
         table += '<thead><tr>';
         columnOrder.forEach((key, index) => {
-            table += `<th scope="col" style="cursor:pointer;"><b>${key}</b></th>`;
+            table += `<th scope="col" style="cursor:pointer;" title="${key.displayName}"><b>${key.code}</b></th>`;
           });
         table += '</tr>';
         table += '</thead>';
@@ -148,7 +169,7 @@ function buildTable(data) {
     data.forEach(row => {
       table += '<tr>';
       columnOrder.forEach(key => {
-        table += `<td>${row[key] || ''}</td>`;
+        table += `<td>${row[key.code] || ''}</td>`;
       });
       table += '</tr>';
     });
