@@ -117,3 +117,20 @@ select {
     background: white !important;
     color: black !important;
 }
+
+.dataTables_filter input {
+    height: 38px; 
+    padding: 6px 12px;
+    font-size: 14px; 
+    line-height: 1.4;
+}
+
+.dt-buttons .btn {
+    height: 38px;
+    padding: 6px 12px;
+}
+
+.dataTables_length select{
+    height: 38px;
+    padding: 6px 12px;
+}

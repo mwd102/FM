@@ -83,11 +83,23 @@ function fetchDataAndDisplayTable() {
       .then(response => response.json())
       .then(data => {
           if (data.length > 0) {
-              const table = buildTable(data);
-              document.getElementById('data-table-container').innerHTML = table;
-              $('#data-table').DataTable(
-                {"pageLength": 25}
-              );
+            const table = buildTable(data);
+            document.getElementById('data-table-container').innerHTML = table;
+            $('#data-table').DataTable({
+                dom:
+                    "<'d-flex justify-content-between'<l><'d-flex flex-row gap-2'<f><B>>>" + // Top row with flexbox and spacing
+                    "<'row'<'col-sm-12'tr>>" +                             // Middle row: table and processing indicator
+                    "<'row'<'col-sm-5'i><'col-sm-7'p>>",  
+                buttons: [
+                    {
+                        extend: 'collection',
+                        text: 'Export',
+                        buttons: ['copy', 'csv']
+                    }
+                ],
+                pageLength: 25,
+                colReorder: true
+            });
               fetch('/clear_data');
           } else {
               document.getElementById('data-table-container').innerHTML = '';
@@ -124,10 +136,9 @@ function buildTable(data) {
   
     if (data.length > 0) {
         
-        showExportButton();
         table += '<thead><tr>';
         columnOrder.forEach((key, index) => {
-            table += `<th scope="col" onclick="sortTable(${index})" style="cursor:pointer;"><b>${key}</b></th>`;
+            table += `<th scope="col" style="cursor:pointer;"><b>${key}</b></th>`;
           });
         table += '</tr>';
         table += '</thead>';
@@ -187,19 +198,6 @@ function exportTableToHTML() {
     document.body.removeChild(link);
 }
 
-function showExportButton() {
-    const exportButton = document.getElementById('export-button');
-    exportButton.style.display = 'block';
-
-    if (!exportButton.getAttribute('data-click-assigned')) {
-        exportButton.addEventListener('click', function(event) {
-            event.preventDefault(); 
-            exportTableToHTML(); 
-        });
-        exportButton.setAttribute('data-click-assigned', 'true');
-    }
-}
-
 
 function filterTable(columnIndex, searchTerm) {
     var table, tr, td, i, txtValue;
@@ -220,77 +218,6 @@ function filterTable(columnIndex, searchTerm) {
     }
 }
   
-
-  
-
-function sortTable(columnIndex) {
-    var table, rows, switching, i, shouldSwitch, direction, switchcount = 0;
-    table = document.getElementById("data-table");
-    switching = true;
-    direction = sortDirections[columnIndex] || 'descending';
-
-    // Cache elements outside the loop
-    let iconElements = document.getElementsByClassName("fa-2xs");
-    let elements = document.getElementsByClassName("fa-2xs");
-
-    for (let i = 0; i < elements.length; i++) {
-        let element = elements[i];
-        element.classList.remove("fa-sort-up", "fa-sort-down");
-        element.classList.add("fa-sort");
-    }
-
-    // Cache rows length
-    rows = table.getElementsByTagName("TR");
-    let rowsLength = rows.length;
-
-    while (switching) {
-        switching = false;
-
-        for (i = 1; i < (rowsLength - 1); i++) {
-            shouldSwitch = false;
-            x = rows[i].getElementsByTagName("TD")[columnIndex];
-            y = rows[i + 1].getElementsByTagName("TD")[columnIndex];
-
-            if (x && y) {
-                // Use textContent instead of innerHTML
-                let xContent = isNaN(parseFloat(x.textContent)) ? x.textContent.toLowerCase() : parseFloat(x.textContent);
-                let yContent = isNaN(parseFloat(y.textContent)) ? y.textContent.toLowerCase() : parseFloat(y.textContent);
-
-                let iconElement = iconElements[columnIndex];
-
-                if ((direction === 'ascending' && xContent < yContent) ||
-                    (direction === 'descending' && xContent > yContent)) {
-                    shouldSwitch = true;
-
-                    if (direction === 'ascending') {
-                        iconElement.classList.remove("fa-sort-up", "fa-sort");
-                        iconElement.classList.add("fa-sort-down");
-                    } else {
-                        if (iconElement.classList.contains("fa-sort")) {
-                            iconElement.classList.remove("fa-sort");
-                        } else {
-                            iconElement.classList.remove("fa-sort-down");
-                        }
-                        iconElement.classList.add("fa-sort-up");
-                    }
-                    break;
-                }
-            }
-        }
-
-        if (shouldSwitch) {
-            rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-            switching = true;
-            switchcount++;
-        } else {
-            if (switchcount === 0 && direction === 'ascending') {
-                direction = 'descending';
-                switching = true;
-            }
-        }
-    }
-    sortDirections[columnIndex] = (direction === 'ascending') ? 'descending' : 'ascending';
-}
 
 //Toggle Light/Dark Mode
 function modeToggle() {
