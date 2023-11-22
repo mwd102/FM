@@ -78,7 +78,7 @@
             {% for function_name, values in function_names.items() %}
             <li class="filter-item">
                 <label>
-                    <input class="form-check-input" type="checkbox" name="{{ values.1 }}" value="{{ function_name }}" data-code="{{ values.1 }}"
+                    <input class="form-check-input" type="checkbox" name="{{ values.1 }}" value="{{ function_name }}" data-code="{{ values.1 }}" data-name="{{values.0}}"
                            {% if values.1 in selected_options %} checked {% endif %}>
                     {{ values.0 }} ({{ values.1 }})
                 </label>
