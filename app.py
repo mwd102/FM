@@ -24,7 +24,6 @@ def count_html_table_rows(file):
     content = file.read() 
     if isinstance(content, bytes):
         content = content.decode('utf-8')
-        print("decoded")
     row_count = content.count('<tr')
     file.seek(0)
     return row_count
