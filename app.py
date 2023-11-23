@@ -19,6 +19,15 @@ app.secret_key = os.environ.get("SECRET_KEY")
 
 data_list = []
 
+def count_html_table_rows(file):
+    file.seek(0)
+    content = file.read() 
+    if isinstance(content, bytes):
+        content = content.decode('utf-8')
+        print("decoded")
+    row_count = content.count('<tr')
+    file.seek(0)
+    return row_count
 
 @app.route('/')
 def index():
@@ -48,6 +57,12 @@ def upload_file():
             return redirect(url_for('index'))
 
         file = request.files['file']
+
+        row_count = count_html_table_rows(file)
+        max_row_count = 1000
+        if row_count > max_row_count:
+            flash(f'Sorry, our application currently supports processing files with up to {max_row_count} rows. Please use a smaller data set or clone https://github.com/Fatheed7/FM/ to run locally.', 'error')
+            return redirect(url_for('index'))
 
         if file.filename == '':
             flash('No file selected', 'error')
