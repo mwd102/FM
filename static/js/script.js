@@ -248,12 +248,12 @@ function modeToggle() {
 
     if (element.dataset.bsTheme == "light") {
         element.dataset.bsTheme = "dark";
-        modeIcon.classList.remove("fa-moon"); // Remove the moon icon
-        modeIcon.classList.add("fa-sun"); // Add the sun icon
+        modeIcon.classList.remove("bi-moon-fill"); // Remove the moon icon
+        modeIcon.classList.add("bi-brightness-high-fill"); // Add the sun icon
     } else {
         element.dataset.bsTheme = "light";
-        modeIcon.classList.remove("fa-sun"); // Remove the sun icon
-        modeIcon.classList.add("fa-moon"); // Add the moon icon
+        modeIcon.classList.remove("bi-brightness-high-fill"); // Remove the sun icon
+        modeIcon.classList.add("bi-moon-fill"); // Add the moon icon
     }
 }
 

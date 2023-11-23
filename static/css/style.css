@@ -134,3 +134,7 @@ select {
     height: 38px;
     padding: 6px 12px;
 }
+
+#data-table_wrapper .row{
+    width: 100vw;
+}
