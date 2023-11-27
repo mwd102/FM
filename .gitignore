@@ -1,2 +1,4 @@
 /calculate_functions/__pycache__
 __pycache__/
+flask_session/
+.gitpod.yml

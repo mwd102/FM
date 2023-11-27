@@ -3,6 +3,7 @@ from flask import (
     redirect, make_response, session, url_for,
     flash, jsonify
     )
+from flask_session import Session
 from function_names import function_names
 import os
 import pandas as pd
@@ -16,6 +17,8 @@ from calculate_functions import *
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY")
+app.config['SESSION_TYPE'] = 'filesystem'
+Session(app)
 
 data_list = []
 
@@ -39,12 +42,12 @@ def index():
 
 @app.route('/get_data')
 def get_data():
-    return jsonify(data_list)
+    return jsonify(session['data_list'])
 
 
 @app.route('/clear_data')
 def clear_data():
-    data_list.clear()
+    session.pop('data_list', None)
     return jsonify({'message': 'Data list cleared successfully'})
 
 
@@ -167,10 +170,9 @@ def upload_file():
                 squad = squad_rawdata[columns_to_export]
 
 
-                global data_list
-                data_list = squad.fillna('').to_dict(orient='records')
-
+                session['data_list'] = squad.fillna('').to_dict(orient='records')
                 session['selected_options'] = selected_options
+                print("Session Data:", session)
 
                 return redirect(url_for('index'))
 
