@@ -8,6 +8,7 @@ from function_names import function_names
 import os
 import pandas as pd
 from werkzeug.utils import secure_filename
+from scout_apm.flask import ScoutApm
 
 if os.path.exists("env.py"):
     import env
@@ -19,6 +20,11 @@ app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY")
 app.config['SESSION_TYPE'] = 'filesystem'
 Session(app)
+ScoutApm(app)
+
+app.config["SCOUT_MONITOR"] = True
+app.config["SCOUT_KEY"] = os.environ.get("SCOUT_KEY")
+app.config["SCOUT_NAME"] = "FM_RECRUITMENT"
 
 data_list = []
 
