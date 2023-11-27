@@ -42,7 +42,10 @@ def index():
 
 @app.route('/get_data')
 def get_data():
-    return jsonify(session['data_list'])
+    if 'data_list' in session:
+        return jsonify(session['data_list'])
+    else:
+        return jsonify({'error': 'data_list not found in session'})
 
 
 @app.route('/clear_data')
@@ -159,6 +162,9 @@ def upload_file():
                     # If neither Wage nor Salary is present, create an 'Earnings' column with NaN values
                     squad_rawdata['Wage'] = None
 
+                if 'Transfer Value' not in squad_rawdata.columns:
+                    squad_rawdata['Transfer Value'] = None
+
                 # Columns to export to HTML
                 columns_to_export = [
                     'Inf', 'Name', 'Age', 'Club', 'Transfer Value', 'Wage',
@@ -169,10 +175,8 @@ def upload_file():
                 # Builds Squad DataFrame using only specified columns
                 squad = squad_rawdata[columns_to_export]
 
-
                 session['data_list'] = squad.fillna('').to_dict(orient='records')
                 session['selected_options'] = selected_options
-                print("Session Data:", session)
 
                 return redirect(url_for('index'))
 
