@@ -70,7 +70,7 @@ def upload_file():
         file = request.files['file']
 
         row_count = count_html_table_rows(file)
-        max_row_count = 1000
+        max_row_count = 2000
         if row_count > max_row_count:
             flash(f'Sorry, our application currently supports processing files with up to {max_row_count} rows. Please use a smaller data set or clone https://github.com/Fatheed7/FM/ to run locally.', 'error')
             return redirect(url_for('index'))
