@@ -1,4 +1,4 @@
-const maxAllowed = 8;
+const maxAllowed = 10;
 const checkboxes = document.querySelectorAll('input[type="checkbox"]');
 var sortDirections = [];
 let selectionOrder = 0;
